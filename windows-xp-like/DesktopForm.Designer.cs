@@ -33,12 +33,14 @@
             this.appIcon1 = new System.Windows.Forms.Button();
             this.taskbarPanel = new System.Windows.Forms.Panel();
             this.taskFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.folderIcon = new System.Windows.Forms.Button();
             this.desktopHost.SuspendLayout();
             this.taskbarPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // desktopHost
             // 
+            this.desktopHost.Controls.Add(this.folderIcon);
             this.desktopHost.Controls.Add(this.taskbarPanel);
             this.desktopHost.Controls.Add(this.appIcon2);
             this.desktopHost.Controls.Add(this.appIcon1);
@@ -86,6 +88,16 @@
             this.taskFlowPanel.Size = new System.Drawing.Size(1264, 30);
             this.taskFlowPanel.TabIndex = 0;
             // 
+            // folderIcon
+            // 
+            this.folderIcon.Location = new System.Drawing.Point(61, 91);
+            this.folderIcon.Name = "folderIcon";
+            this.folderIcon.Size = new System.Drawing.Size(75, 23);
+            this.folderIcon.TabIndex = 2;
+            this.folderIcon.Text = "내 문서";
+            this.folderIcon.UseVisualStyleBackColor = true;
+            this.folderIcon.Click += new System.EventHandler(this.folderIcon_Click);
+            // 
             // DesktopForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -108,6 +120,7 @@
         private System.Windows.Forms.Button appIcon2;
         private System.Windows.Forms.Panel taskbarPanel;
         private System.Windows.Forms.FlowLayoutPanel taskFlowPanel;
+        private System.Windows.Forms.Button folderIcon;
     }
 }
 

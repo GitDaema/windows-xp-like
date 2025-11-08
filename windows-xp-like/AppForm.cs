@@ -50,7 +50,7 @@ namespace windows_xp_like
         private Color _titleBarColor = Color.FromArgb(0, 84, 227); // 예시: Windows 10/11 블루
         private Color _titleTextColor = Color.White;
 
-        private Form _innerForm = null;
+        private Control _innerForm = null;
         private double _innerFormRatio = 0.0;
         private Size _innerFormMinSize = Size.Empty;
         private Size _innerFormMaxSize = Size.Empty;
@@ -399,7 +399,7 @@ namespace windows_xp_like
         }
 
         // ===== Public: embed any inner form =====
-        public void LoadInnerForm(Form inner, bool isRatioLocked = true)
+        public void LoadInnerForm(Control inner, bool isRatioLocked = true)
         {
             if (inner == null) return;
 
@@ -408,7 +408,13 @@ namespace windows_xp_like
             // [수정] 기존 폼들 제거 (이전과 동일)
             foreach (Control c in this.Controls)
             {
-                if (c is Form && c != inner)
+                // 2. (c is Form) 조건을 (c != inner && c != closeButton ...)로 변경
+                //    c is Form -> c is Control로 바꾸면 버튼까지 다 지워지므로
+                //    내부 콘텐츠(inner)만 골라서 지우도록 조건을 수정합니다.
+                if (c != inner &&
+                    c != closeButton &&
+                    c != maximizeButton &&
+                    c != minimizeButton)
                 {
                     this.Controls.Remove(c);
                     c.Dispose();
@@ -417,8 +423,15 @@ namespace windows_xp_like
             _innerForm = null; // [추가] 기존 폼 참조 초기화
 
             _innerForm = inner;
-            inner.TopLevel = false;
-            inner.FormBorderStyle = FormBorderStyle.None;
+
+            if (inner is Form)
+            {
+                // Form 타입일 때만 TopLevel과 FormBorderStyle을 설정합니다.
+                Form innerAsForm = inner as Form;
+                innerAsForm.TopLevel = false;
+                innerAsForm.FormBorderStyle = FormBorderStyle.None;
+            }
+
             inner.Dock = DockStyle.None;
             inner.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 

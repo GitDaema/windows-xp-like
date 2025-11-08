@@ -58,6 +58,13 @@
     <Compile Include="DesktopForm.Designer.cs">
       <DependentUpon>DesktopForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FileSystemItem.cs" />
+    <Compile Include="FolderView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FolderView.Designer.cs">
+      <DependentUpon>FolderView.cs</DependentUpon>
+    </Compile>
     <Compile Include="GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -71,6 +78,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DesktopForm.resx">
       <DependentUpon>DesktopForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FolderView.resx">
+      <DependentUpon>FolderView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>

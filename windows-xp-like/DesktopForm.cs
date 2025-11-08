@@ -15,6 +15,9 @@ namespace windows_xp_like
         private AppForm _appA;
         private AppForm _appB;
 
+        private AppForm _appC;
+        private AppForm _appGame;
+
         public DesktopForm()
         {
             InitializeComponent();
@@ -56,20 +59,25 @@ namespace windows_xp_like
             taskButton.Click += (sender, args) =>
             {
                 Form appForm = (sender as Button).Tag as Form;
-                if (appForm != null && !appForm.IsDisposed)
+                if (appForm == null || appForm.IsDisposed)
                 {
-                    // [NEW] 1. 최소화 상태(숨겨진)라면 복원
-                    if (!appForm.Visible)
-                    {
-                        appForm.Show();
-                    }
+                    return; // 폼이 없거나 파괴되었으면 아무것도 안 함
+                }
 
-                    // [기존] 2. 폼을 맨 앞으로 가져오기
+                // [수정] 1. 최소화 상태(숨겨진)라면 복원
+                if (!appForm.Visible)
+                {
+                    appForm.Show();
                     appForm.BringToFront();
 
-                    // [기존] 3. Z-Order 보정 (기존)
+                    // Z-Order 보정
                     taskbarPanel.BringToFront();
                     desktopHost.SendToBack();
+                }
+                // [수정] 2. 이미 보이는 상태일 때
+                else
+                {
+                    appForm.Hide();
                 }
             };
 
@@ -99,19 +107,27 @@ namespace windows_xp_like
 
         private void appIcon1_Click(object sender, EventArgs e)
         {
+            // [수정] 이 메서드는 이제 새 메서드를 호출만 합니다.
+            LaunchAppA();
+        }
+
+        // 2. [신규] 'appA'를 실행하는 전용 메서드를 만듭니다.
+        // (appIcon1_Click에서 잘라낸 코드를 여기에 '붙여넣기' 합니다)
+        private void LaunchAppA()
+        {
             if (_appA != null && !_appA.IsDisposed)
             {
                 _appA.BringToFront();
-                // [수정] 이미 열린 폼을 클릭할 때도 Z-Order 보정
                 desktopHost.SendToBack();
                 taskbarPanel.BringToFront();
                 return;
             }
 
             _appA = CreateAppForm(new Point(40, 40), new Size(520, 360), "App A");
-            _appA.LoadInnerForm(new GameForm());
-            _appA.Disposed += (_, __) => _appA = null; // 닫히면 참조 정리
+            _appA.LoadInnerForm(new GameForm(), true); // GameForm은 true로 하신다고 했죠
+            _appA.Disposed += (_, __) => _appA = null;
         }
+
 
         private void appIcon2_Click(object sender, EventArgs e)
         {
@@ -133,6 +149,58 @@ namespace windows_xp_like
         {
             taskbarPanel.BringToFront();
             desktopHost.SendToBack();
+        }
+
+        private void folderIcon_Click(object sender, EventArgs e)
+        {
+            // 이미 열려있으면 맨 앞으로 가져오기
+            if (_appC != null && !_appC.IsDisposed)
+            {
+                _appC.BringToFront();
+                desktopHost.SendToBack();
+                taskbarPanel.BringToFront();
+                return;
+            }
+
+            // 1. 새 AppForm 생성
+            _appC = CreateAppForm(new Point(100, 60), new Size(450, 350), "내 문서");
+
+            // 2. FolderView '부품' 생성
+            var folder = new FolderView();
+
+            // 3. [핵심] FolderView가 "ItemDoubleClicked" 신호를 보내면,
+            //    DesktopForm의 "FolderView_ItemDoubleClicked" 메서드가 받아서 처리!
+            folder.ItemDoubleClicked += FolderView_ItemDoubleClicked;
+
+            // 4. AppForm에 GameForm 대신 FolderView를 삽입 (비율 고정 false)
+            _appC.LoadInnerForm(folder, true);
+            _appC.Disposed += (_, __) => _appC = null; // 닫히면 참조 정리
+        }
+
+        // 2. FolderView가 보낸 '신호'를 처리할 실제 메서드 (새로 추가)
+        private void FolderView_ItemDoubleClicked(FileSystemItem item)
+        {
+            if (item == null) return;
+
+            // [핵심 수정] item.Name 대신 item.ActionKey를 검사합니다.
+            switch (item.ActionKey)
+            {
+                case "LAUNCH_APP_A":
+                    // "appA를 실행하라"는 꼬리표가 붙은 아이템이므로 LaunchAppA() 호출
+                    LaunchAppA();
+                    break;
+
+                case "OPEN_FOLDER":
+                    // [나중 확장] "폴더를 열라"는 꼬리표
+                    MessageBox.Show(item.Name + " 폴더를 엽니다. (아직 구현되지 않음)");
+                    break;
+
+                case "OPEN_FILE":
+                default:
+                    // "일반 파일을 열라" 또는 그 외의 모든 경우
+                    MessageBox.Show(item.Name + " 파일을 열 수 없습니다.");
+                    break;
+            }
         }
     }
 }
