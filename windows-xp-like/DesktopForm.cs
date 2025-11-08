@@ -30,6 +30,7 @@ namespace windows_xp_like
                 Size = size
             };
             f.Text = title ?? "App";
+            f.TaskbarPanel = taskbarPanel;
 
             // [NEW] 1. 작업 표시줄 버튼 생성
             Button taskButton = new Button();
@@ -37,18 +38,36 @@ namespace windows_xp_like
             taskButton.AutoSize = true; // 또는 고정 크기
             taskButton.Tag = f; // [중요] 버튼에 폼 인스턴스 연결
 
+            f.VisibleChanged += (formSender, formArgs) =>
+            {
+                if (f.Visible)
+                {
+                    // 폼이 보이게 됨 (복원됨)
+                    taskButton.BackColor = SystemColors.Control; // 원래 버튼 색상
+                }
+                else
+                {
+                    // 폼이 숨겨짐 (최소화됨)
+                    taskButton.BackColor = SystemColors.WindowFrame; // 최소화 상태를 나타내는 다른 색상
+                }
+            };
+
             // [NEW] 2. 작업 표시줄 버튼 클릭 이벤트 연결
             taskButton.Click += (sender, args) =>
             {
                 Form appForm = (sender as Button).Tag as Form;
                 if (appForm != null && !appForm.IsDisposed)
                 {
-                    // TODO: 최소화 상태라면 복원 (Show)
+                    // [NEW] 1. 최소화 상태(숨겨진)라면 복원
+                    if (!appForm.Visible)
+                    {
+                        appForm.Show();
+                    }
 
-                    // 일단은 맨 앞으로 가져오기
+                    // [기존] 2. 폼을 맨 앞으로 가져오기
                     appForm.BringToFront();
 
-                    // [수정] 작업 표시줄 버튼 클릭 시에도 Z-Order 보정
+                    // [기존] 3. Z-Order 보정 (기존)
                     taskbarPanel.BringToFront();
                     desktopHost.SendToBack();
                 }

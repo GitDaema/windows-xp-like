@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.closeButton = new System.Windows.Forms.Button();
+            this.minimizeButton = new System.Windows.Forms.Button();
+            this.maximizeButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // closeButton
@@ -41,12 +43,32 @@
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
             // 
+            // minimizeButton
+            // 
+            this.minimizeButton.Location = new System.Drawing.Point(363, 214);
+            this.minimizeButton.Name = "minimizeButton";
+            this.minimizeButton.Size = new System.Drawing.Size(75, 23);
+            this.minimizeButton.TabIndex = 2;
+            this.minimizeButton.Text = "-";
+            this.minimizeButton.UseVisualStyleBackColor = true;
+            // 
+            // maximizeButton
+            // 
+            this.maximizeButton.Location = new System.Drawing.Point(547, 167);
+            this.maximizeButton.Name = "maximizeButton";
+            this.maximizeButton.Size = new System.Drawing.Size(75, 23);
+            this.maximizeButton.TabIndex = 3;
+            this.maximizeButton.Text = "ㅁ";
+            this.maximizeButton.UseVisualStyleBackColor = true;
+            // 
             // AppForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.maximizeButton);
+            this.Controls.Add(this.minimizeButton);
             this.Controls.Add(this.closeButton);
             this.MinimumSize = new System.Drawing.Size(320, 200);
             this.Name = "AppForm";
@@ -64,5 +86,7 @@
         #endregion
 
         private System.Windows.Forms.Button closeButton;
+        private System.Windows.Forms.Button minimizeButton;
+        private System.Windows.Forms.Button maximizeButton;
     }
 }
