@@ -24,6 +24,19 @@ namespace windows_xp_like
         private const int HTBOTTOMLEFT = 16;
         private const int HTBOTTOMRIGHT = 17;
 
+        private const int WM_SIZING = 0x214;
+        private const int WMSZ_LEFT = 1;
+        private const int WMSZ_RIGHT = 2;
+        private const int WMSZ_TOP = 3;
+        private const int WMSZ_TOPLEFT = 4;
+        private const int WMSZ_TOPRIGHT = 5;
+        private const int WMSZ_BOTTOM = 6;
+        private const int WMSZ_BOTTOMLEFT = 7;
+        private const int WMSZ_BOTTOMRIGHT = 8;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT { public int Left, Top, Right, Bottom; }
+
         // ===== Clamp 가드 =====
         private bool _clampingSize;
 
@@ -32,6 +45,11 @@ namespace windows_xp_like
         private Color _titleTextColor = Color.White;
 
         private Form _innerForm = null;
+        private double _innerFormRatio = 0.0;
+        private Size _innerFormMinSize = Size.Empty;
+        private Size _innerFormMaxSize = Size.Empty;
+
+        private bool _isRatioLocked = true;
 
         public AppForm()
         {
@@ -123,6 +141,58 @@ namespace windows_xp_like
                 return;
             }
 
+            // [NEW 2] WM_SIZING (비율 강제)
+            // (WM_NCHITTEST *이후*, base.WndProc *이전*에 위치)
+            if (m.Msg == WM_SIZING && _isRatioLocked && _innerFormRatio > 0.0)
+            {
+                RECT rect = (RECT)Marshal.PtrToStructure(m.LParam, typeof(RECT));
+                int edge = m.WParam.ToInt32();
+
+                int padH = this.Padding.Horizontal;
+                int padV = this.Padding.Vertical;
+
+                int newWidth = rect.Right - rect.Left;
+                int newHeight = rect.Bottom - rect.Top;
+
+                int contentWidth = newWidth - padH;
+                int contentHeight = newHeight - padV;
+
+                switch (edge)
+                {
+                    // 너비가 변할 때: 너비를 기준으로 높이 강제 조절
+                    case WMSZ_LEFT:
+                    case WMSZ_RIGHT:
+                        contentHeight = (int)(contentWidth / _innerFormRatio);
+                        newHeight = contentHeight + padV;
+                        rect.Bottom = rect.Top + newHeight;
+                        break;
+
+                    // 높이가 변할 때: 높이를 기준으로 너비 강제 조절
+                    case WMSZ_TOP:
+                    case WMSZ_BOTTOM:
+                        contentWidth = (int)(contentHeight * _innerFormRatio);
+                        newWidth = contentWidth + padH;
+                        rect.Right = rect.Left + newWidth;
+                        break;
+
+                    // 코너가 변할 때: 너비 기준(우선)으로 높이 조절
+                    case WMSZ_TOPLEFT:
+                    case WMSZ_TOPRIGHT:
+                        contentHeight = (int)(contentWidth / _innerFormRatio);
+                        newHeight = contentHeight + padV;
+                        rect.Top = rect.Bottom - newHeight; // 상단 코너이므로 Top 위치를 보정
+                        break;
+                    case WMSZ_BOTTOMLEFT:
+                    case WMSZ_BOTTOMRIGHT:
+                        contentHeight = (int)(contentWidth / _innerFormRatio);
+                        newHeight = contentHeight + padV;
+                        rect.Bottom = rect.Top + newHeight; // 하단 코너이므로 Bottom 위치를 보정
+                        break;
+                }
+
+                Marshal.StructureToPtr(rect, m.LParam, true);
+            }
+
             base.WndProc(ref m);
         }
 
@@ -206,7 +276,7 @@ namespace windows_xp_like
             UpdateFormRegion(); // (이전 둥근 모서리 코드)
 
             // [추가] 폼 크기가 바뀌었으므로 내부 폼도 다시 중앙 정렬
-            CenterInnerForm();
+            UpdateInnerFormLayout();
         }
 
 
@@ -268,9 +338,11 @@ namespace windows_xp_like
         }
 
         // ===== Public: embed any inner form =====
-        public void LoadInnerForm(Form inner)
+        public void LoadInnerForm(Form inner, bool isRatioLocked = true)
         {
             if (inner == null) return;
+
+            _isRatioLocked = isRatioLocked;
 
             // [수정] 기존 폼들 제거 (이전과 동일)
             foreach (Control c in this.Controls)
@@ -283,44 +355,101 @@ namespace windows_xp_like
             }
             _innerForm = null; // [추가] 기존 폼 참조 초기화
 
+            _innerForm = inner;
             inner.TopLevel = false;
             inner.FormBorderStyle = FormBorderStyle.None;
-
-            // [핵심 수정]
-            // 1. 늘어나지 않도록 Dock = None
             inner.Dock = DockStyle.None;
-            // 2. 부모 크기 조절 시 위치가 마음대로 변하지 않도록 Anchor = Top, Left
-            //    (또는 Anchor = None)
             inner.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 
-            // [추가] 내부 폼 참조 저장
-            _innerForm = inner;
+            // [핵심 1] GameForm의 제약사항 읽기
+            // GameForm의 원본 크기를 비율 계산에 사용
+            _innerFormRatio = (double)inner.Width / inner.Height;
+            _innerFormMinSize = inner.MinimumSize;
+            _innerFormMaxSize = inner.MaximumSize; // (0, 0일 수 있음)
+
+            // [핵심 2] AppForm의 최소/최대 크기를 GameForm에 맞게 설정
+            // (Padding 크기를 더해줌)
+            int padH = this.Padding.Horizontal; // (Left + Right)
+            int padV = this.Padding.Vertical;   // (Top + Bottom)
+
+            if (_innerFormMinSize.Width > 0 && _innerFormMinSize.Height > 0)
+            {
+                this.MinimumSize = new Size(
+                    _innerFormMinSize.Width + padH,
+                    _innerFormMinSize.Height + padV
+                );
+            }
+
+            if (_innerFormMaxSize.Width > 0 && _innerFormMaxSize.Height > 0)
+            {
+                this.MaximumSize = new Size(
+                    _innerFormMaxSize.Width + padH,
+                    _innerFormMaxSize.Height + padV
+                );
+            }
 
             this.Controls.Add(inner);
             inner.Show();
-
             HookBringToFront(inner);
             inner.SendToBack();
 
-            // [추가] 폼을 중앙에 1차 배치
-            CenterInnerForm();
+            // [핵심 3] 레이아웃 업데이트 호출
+            UpdateInnerFormLayout();
         }
 
-        // ===== [추가] 내부 폼을 중앙에 배치하는 메서드 =====
-        private void CenterInnerForm()
+        // CenterInnerForm 메서드를 아래와 같이 수정 (이름 변경 및 로직 단순화)
+        private void UpdateInnerFormLayout()
         {
-            // 로드된 폼이 없거나, 이미 닫혔으면 아무것도 안 함
             if (_innerForm == null || _innerForm.IsDisposed) return;
 
-            // AppForm의 Padding 안쪽 영역 (컨텐츠 영역)을 가져옴
             Rectangle contentRect = this.DisplayRectangle;
+            if (contentRect.Width <= 0 || contentRect.Height <= 0) return;
 
-            // 중앙 좌표 계산
-            int x = contentRect.Left + (contentRect.Width - _innerForm.Width) / 2;
-            int y = contentRect.Top + (contentRect.Height - _innerForm.Height) / 2;
+            // [NEW] 스위치 확인
+            if (_isRatioLocked)
+            {
+                // 1. [비율 고정 모드]
+                // WM_SIZING이 비율을 보장하므로, 컨텐츠 영역을 꽉 채움 (스트레칭)
+                _innerForm.Location = contentRect.Location;
+                _innerForm.Size = contentRect.Size;
+            }
+            else
+            {
+                // 2. [자유 비율 모드] (비율 고정 해제)
+                // GameForm이 찌그러지지 않도록 원본 비율을 유지하며 중앙에 배치 (레터박스)
 
-            // 내부 폼의 위치 설정
-            _innerForm.Location = new Point(x, y);
+                // 원본 폼의 가로세로 비율
+                // (_innerFormRatio는 LoadInnerForm에서 이미 계산됨)
+                double originalRatio = _innerFormRatio;
+
+                // 현재 컨텐츠 영역의 가로세로 비율
+                double contentRatio = (double)contentRect.Width / contentRect.Height;
+
+                int newWidth;
+                int newHeight;
+
+                if (contentRatio > originalRatio)
+                {
+                    // 컨텐츠 영역이 더 넓적한 경우 -> 높이에 맞춤
+                    newHeight = contentRect.Height;
+                    newWidth = (int)(newHeight * originalRatio);
+                }
+                else
+                {
+                    // 컨텐츠 영역이 더 길쭉한 경우 -> 너비에 맞춤
+                    newWidth = contentRect.Width;
+                    newHeight = (int)(newWidth / originalRatio);
+                }
+
+                // 새 크기 적용
+                _innerForm.Size = new Size(newWidth, newHeight);
+
+                // 중앙 좌표 계산
+                int x = contentRect.Left + (contentRect.Width - newWidth) / 2;
+                int y = contentRect.Top + (contentRect.Height - newHeight) / 2;
+
+                _innerForm.Location = new Point(x, y);
+            }
         }
 
         // ===== Close =====
@@ -351,10 +480,37 @@ namespace windows_xp_like
         private void Any_MouseDown_BringToFront(object sender, MouseEventArgs e)
         {
             Control c = sender as Control;
-            Form f = c?.FindForm();
+            Form f = c?.FindForm(); // f는 AppForm 인스턴스입니다.
+
             if (f != null && f is AppForm)
             {
+                // 1. (기존) AppForm을 부모(desktopHost) 안에서 맨 앞으로 가져옵니다.
                 f.BringToFront();
+
+                // 2. [핵심 수정] 
+                //    AppForm의 부모(desktopHost)와 그 부모(DesktopForm)를 찾습니다.
+                if (f.Parent != null && f.Parent.Parent != null)
+                {
+                    Control desktopHost = f.Parent; // 이것이 'desktopHost' 패널입니다.
+                    Form desktopForm = f.Parent.Parent as Form; // 이것이 'DesktopForm'입니다.
+
+                    if (desktopForm != null)
+                    {
+                        Control taskbar = desktopForm.Controls["taskbarPanel"];
+                        if (taskbar != null)
+                        {
+                            // [중요] 매번 Z 순서를 완벽하게 재설정합니다.
+
+                            // 1. desktopHost를 맨 뒤로 보냅니다.
+                            //    (데스크탑 아이콘들보다도 뒤로 가서 "배경" 역할을 하게 됨)
+                            desktopHost.SendToBack();
+
+                            // 2. taskbarPanel을 맨 앞으로 보냅니다.
+                            //    (desktopHost와 아이콘들 모두를 덮음)
+                            taskbar.BringToFront();
+                        }
+                    }
+                }
             }
         }
     }

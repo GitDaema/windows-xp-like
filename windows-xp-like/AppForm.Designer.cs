@@ -39,6 +39,7 @@
             this.closeButton.TabIndex = 1;
             this.closeButton.Text = "X";
             this.closeButton.UseVisualStyleBackColor = true;
+            this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
             // 
             // AppForm
             // 

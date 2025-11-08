@@ -29,30 +29,24 @@
         private void InitializeComponent()
         {
             this.desktopHost = new System.Windows.Forms.Panel();
-            this.appIcon1 = new System.Windows.Forms.Button();
             this.appIcon2 = new System.Windows.Forms.Button();
+            this.appIcon1 = new System.Windows.Forms.Button();
+            this.taskbarPanel = new System.Windows.Forms.Panel();
+            this.taskFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.desktopHost.SuspendLayout();
+            this.taskbarPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // desktopHost
             // 
+            this.desktopHost.Controls.Add(this.taskbarPanel);
             this.desktopHost.Controls.Add(this.appIcon2);
             this.desktopHost.Controls.Add(this.appIcon1);
             this.desktopHost.Dock = System.Windows.Forms.DockStyle.Fill;
             this.desktopHost.Location = new System.Drawing.Point(0, 0);
             this.desktopHost.Name = "desktopHost";
-            this.desktopHost.Size = new System.Drawing.Size(984, 561);
+            this.desktopHost.Size = new System.Drawing.Size(1264, 681);
             this.desktopHost.TabIndex = 0;
-            // 
-            // appIcon1
-            // 
-            this.appIcon1.Location = new System.Drawing.Point(3, 3);
-            this.appIcon1.Name = "appIcon1";
-            this.appIcon1.Size = new System.Drawing.Size(75, 23);
-            this.appIcon1.TabIndex = 0;
-            this.appIcon1.Text = "button1";
-            this.appIcon1.UseVisualStyleBackColor = true;
-            this.appIcon1.Click += new System.EventHandler(this.appIcon1_Click);
             // 
             // appIcon2
             // 
@@ -64,15 +58,45 @@
             this.appIcon2.UseVisualStyleBackColor = true;
             this.appIcon2.Click += new System.EventHandler(this.appIcon2_Click);
             // 
+            // appIcon1
+            // 
+            this.appIcon1.Location = new System.Drawing.Point(3, 3);
+            this.appIcon1.Name = "appIcon1";
+            this.appIcon1.Size = new System.Drawing.Size(75, 23);
+            this.appIcon1.TabIndex = 0;
+            this.appIcon1.Text = "button1";
+            this.appIcon1.UseVisualStyleBackColor = true;
+            this.appIcon1.Click += new System.EventHandler(this.appIcon1_Click);
+            // 
+            // taskbarPanel
+            // 
+            this.taskbarPanel.BackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.taskbarPanel.Controls.Add(this.taskFlowPanel);
+            this.taskbarPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.taskbarPanel.Location = new System.Drawing.Point(0, 651);
+            this.taskbarPanel.Name = "taskbarPanel";
+            this.taskbarPanel.Size = new System.Drawing.Size(1264, 30);
+            this.taskbarPanel.TabIndex = 1;
+            // 
+            // taskFlowPanel
+            // 
+            this.taskFlowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.taskFlowPanel.Location = new System.Drawing.Point(0, 0);
+            this.taskFlowPanel.Name = "taskFlowPanel";
+            this.taskFlowPanel.Size = new System.Drawing.Size(1264, 30);
+            this.taskFlowPanel.TabIndex = 0;
+            // 
             // DesktopForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 561);
+            this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.desktopHost);
             this.Name = "DesktopForm";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.DesktopForm_Load);
             this.desktopHost.ResumeLayout(false);
+            this.taskbarPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -82,6 +106,8 @@
         private System.Windows.Forms.Panel desktopHost;
         private System.Windows.Forms.Button appIcon1;
         private System.Windows.Forms.Button appIcon2;
+        private System.Windows.Forms.Panel taskbarPanel;
+        private System.Windows.Forms.FlowLayoutPanel taskFlowPanel;
     }
 }
 
