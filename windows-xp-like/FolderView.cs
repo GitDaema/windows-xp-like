@@ -6,80 +6,77 @@ namespace windows_xp_like
 {
     public partial class FolderView : UserControl
     {
-        // [핵심] 6단계에서 DesktopForm이 이 신호를 받아서 처리합니다.
+        // 폴더 뷰의 아이템이 더블 클릭되었을 때 
         public event Action<FileSystemItem> ItemDoubleClicked;
 
         public FolderView()
         {
             InitializeComponent();
-
-            // 디자이너에서 설정했지만, 코드로도 확인
-            this.listView1.DoubleClick += ListView1_DoubleClick;
-            this.listView1.AfterLabelEdit += ListView1_AfterLabelEdit;
         }
 
-        // Form_Load와 동일한 역할
         private void FolderView_Load(object sender, EventArgs e)
         {
-            // 컨트롤이 처음 로드될 때 테스트용 아이템들을 채워 넣습니다.
-            LoadItems(GetMockData());
-        }
-
-        // 테스트용 '가짜' 데이터를 만듭니다.
-        private List<FileSystemItem> GetMockData()
-        {
-            return new List<FileSystemItem>
+            List<FileSystemItem> testDataList = new List<FileSystemItem>
             {
                 new FileSystemItem("내 문서", true),
-                new FileSystemItem("Game.exe", false, "LAUNCH_APP_A"),
+                new FileSystemItem("Game.exe", false, new GameForm()),
                 new FileSystemItem("메모장.txt", false)
             };
+
+            LoadItems(testDataList);
         }
 
-        // FileSystemItem 리스트를 받아서 ListView에 아이템을 채웁니다.
+        /// <summary>
+        /// FileSystemItem 리스트를 받아서 그 항목들을 리스트 뷰에 아이템으로 넣는 메서드
+        /// </summary>
+        /// <param name="items"></param>
         public void LoadItems(List<FileSystemItem> items)
         {
-            listView1.Items.Clear(); // 기존 아이템 삭제
+            listView1.Items.Clear(); // 혹시 모르니 아이템 항목 초기화 초기화
 
-            foreach (var item in items)
+            foreach (FileSystemItem item in items) // 리스트의 모든 아이템 순회
             {
-                // IsFolder가 true면 0번(폴더) 아이콘, 아니면 1번(파일) 아이콘
-                int iconIndex = item.IsFolder ? 0 : 1;
+                // 아이템이 폴더라면 0번(폴더) 아이콘, 아니면 1번(파일) 아이콘
+                int iconIndex;
+                if (item.IsFolder)
+                    iconIndex = 0;
+                else
+                    iconIndex = 1;
 
+                // 리스트 뷰에 들어갈 수 있는 형태 자리를 생성한 후
                 ListViewItem lvi = new ListViewItem(item.Name, iconIndex);
-                lvi.Tag = item; // [중요] ListViewItem에 원본 데이터(FileSystemItem)를 저장
+                lvi.Tag = item; // 태그를 이용해 어떤 파일 아이템인지 전달
 
-                listView1.Items.Add(lvi);
+                listView1.Items.Add(lvi); // 리스트 뷰에 실제 추가
             }
         }
 
-        // ListView에서 아이템을 더블클릭했을 때
         private void ListView1_DoubleClick(object sender, EventArgs e)
         {
             if (listView1.SelectedItems.Count == 1)
             {
-                // Tag에 저장했던 원본 FileSystemItem 데이터를 가져옵니다.
+                // 선택된 아이템들 중 0번 인덱스 항목의 태그를 이용해서 파일 아이템 가져오기
                 FileSystemItem selectedItem = listView1.SelectedItems[0].Tag as FileSystemItem;
 
                 if (selectedItem != null)
                 {
-                    // "나는 모르겠다. 주인에게 이 아이템을 열어달라고 신호(Event)를 보낸다."
+                    // 데스크톱에게 이벤트를 보내서 선택된 아이템에 맞는 실행 역할 넘기기
+                    // 이벤트 방식 안 쓰면 public 메서드 직접 호출 방식이라 너무 의존
                     ItemDoubleClicked?.Invoke(selectedItem);
                 }
             }
         }
 
-        // 아이템 이름 바꾸기가 끝났을 때
         private void ListView1_AfterLabelEdit(object sender, LabelEditEventArgs e)
         {
-            // e.Label이 null이면 사용자가 취소(ESC)한 것
+            // 레이블이 null이면 사용자가 esc 키 등을 눌러서 취소한 것이니 미반영
             if (string.IsNullOrWhiteSpace(e.Label))
             {
-                e.CancelEdit = true; // 이름 바꾸기 취소
+                e.CancelEdit = true;
                 return;
             }
 
-            // Tag에 저장된 원본 데이터의 Name 속성도 같이 변경
+            // 이름이 바뀌었으니 태그에 저장된 원본 아이템의 이름 속성도 함께 변경
             FileSystemItem item = listView1.Items[e.Item].Tag as FileSystemItem;
             if (item != null)
             {
@@ -87,32 +84,27 @@ namespace windows_xp_like
             }
         }
 
-
-        // [디자이너]에서 "새로 만들기 > 폴더" 메뉴를 더블클릭하면 이 함수가 생성됩니다.
-        // (만약 함수 이름이 다르면 디자이너의 이벤트 속성에서 직접 연결해야 합니다.)
         private void 폴더ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // 1. 새 가짜 데이터 생성
+            // 파일 아이템 형식으로 새 폴더 생성, 아직은 미구현된
             FileSystemItem newItem = new FileSystemItem("새 폴더", true);
 
-            // 2. ListView에 아이템 추가 (0번 = 폴더 아이콘)
+            // 리스트 뷰에 추가 후 태그 연결
             ListViewItem lvi = new ListViewItem(newItem.Name, 0);
-            lvi.Tag = newItem; // 데이터 연결
+            lvi.Tag = newItem;
 
             listView1.Items.Add(lvi);
 
-            // 3. 방금 만든 아이템의 이름 바꾸기 모드 시작
+            // 새로 폴더 생성하면 무조건 이름 바꾸기 상태로 진입
             lvi.BeginEdit();
         }
 
-        // [디자이너]에서 "삭제" 메뉴를 더블클릭하면 이 함수가 생성됩니다.
         private void 삭제ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // 선택된 모든 아이템을 순회하며 삭제
+            // 리스트 뷰의 기본 기능을 이용해 여러 아이템을 선택할 수도 있으므로 전부 순회
             foreach (ListViewItem item in listView1.SelectedItems)
             {
-                // (실제 파일 삭제 로직은 없으므로)
-                item.Remove(); // ListView에서만 제거
+                item.Remove(); // 실제 삭제 기능은 아니지만 우선 리스트 뷰에서는 제거
             }
         }
     }

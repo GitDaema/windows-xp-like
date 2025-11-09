@@ -1,32 +1,32 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace windows_xp_like
 {
+    /// <summary>
+    /// FolderView에서 생성할 아이템의 정보를 저장하는 클래스
+    /// </summary>
     public class FileSystemItem
     {
+        /// <summary>
+        /// "지뢰찾기.exe" 같이 화면에 표시될 이름 문자열 
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// true면 폴더, false면 파일
+        /// </summary>
         public bool IsFolder { get; set; }
 
-        // [추가] 이 아이템이 수행할 액션을 구분하는 '꼬리표'
-        // 예: "LAUNCH_APP_A", "LAUNCH_APP_B", "OPEN_FOLDER"
-        public string ActionKey { get; set; }
+        /// <summary>
+        /// 파일 또는 특수 폴더를 열었을 때 열릴 폼
+        /// </summary>
+        public Control ActionControl { get; set; }
 
-        // [수정] 생성자에서 ActionKey도 받을 수 있게 (선택적)
-        public FileSystemItem(string name, bool isFolder = false, string actionKey = null)
+        public FileSystemItem(string name, bool isFolder = false, Form actionControl = null)
         {
-            this.Name = name;
-            this.IsFolder = isFolder;
-
-            // IsFolder가 true면 기본 ActionKey를 "OPEN_FOLDER"로 설정
-            // actionKey가 null일 때만 (외부에서 지정 안 했을 때만)
-            if (actionKey == null)
-            {
-                this.ActionKey = isFolder ? "OPEN_FOLDER" : "OPEN_FILE"; // 기본값
-            }
-            else
-            {
-                this.ActionKey = actionKey; // 외부에서 지정한 값 사용
-            }
+            Name = name;
+            IsFolder = isFolder;
+            ActionControl = actionControl;
         }
     }
 }
