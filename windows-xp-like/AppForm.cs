@@ -45,6 +45,8 @@ namespace windows_xp_like
         private const int WMSZ_BOTTOMLEFT = 7;
         private const int WMSZ_BOTTOMRIGHT = 8;
 
+        public Image IconImage { get; set; } // 폼의 아이콘 이미지를 저장할 속성
+
         // Win32에서 사용하는 좌표용 사각형 구조체 
         // 지금 쓰는 C#과 Win32 간에 값을 읽고 쓰기 위해 설정 
 
@@ -276,6 +278,9 @@ namespace windows_xp_like
         {
             base.OnPaint(e);
 
+            Graphics g = e.Graphics; // Graphics 객체를 미리 가져와서
+            g.SmoothingMode = SmoothingMode.AntiAlias; // 아이콘을 부드럽게 그릴 수 있도록 설정
+
             int width = ClientSize.Width;
             int height = ClientSize.Height;
 
@@ -293,7 +298,7 @@ namespace windows_xp_like
                 LinearGradientMode.Vertical  // 방향은 수직
             ))
             {
-                e.Graphics.FillRectangle(titleBrush, titleRect);
+                g.FillRectangle(titleBrush, titleRect);
             } 
 
             // 나머지 테두리에는 그라데이션 없이 기본 색상으로 브러시 설정
@@ -306,19 +311,19 @@ namespace windows_xp_like
                     Rectangle leftRect = new Rectangle(
                         0, Padding.Top,
                         Padding.Left, height - Padding.Top - Padding.Bottom);
-                    e.Graphics.FillRectangle(titleBrush, leftRect);
+                    g.FillRectangle(titleBrush, leftRect);
 
                     // 오른쪽 테두리 그리기
                     Rectangle rightRect = new Rectangle(
                         width - Padding.Right, Padding.Top,
                         Padding.Right, height - Padding.Top - Padding.Bottom);
-                    e.Graphics.FillRectangle(titleBrush, rightRect);
+                    g.FillRectangle(titleBrush, rightRect);
 
                     // 하단 테두리 그리기
                     Rectangle bottomRect = new Rectangle(
                         0, height - Padding.Bottom,
                         width, Padding.Bottom);
-                    e.Graphics.FillRectangle(titleBrush, bottomRect);
+                    g.FillRectangle(titleBrush, bottomRect);
                 }
             }
 
@@ -336,11 +341,28 @@ namespace windows_xp_like
                 realPaddingRight = Padding.Right;
             }
 
-            // 텍스트 너비 = 전체 폭 - (좌우 여백) - (버튼 3개 너비) - (버튼 간 간격 + 여유)
+            int iconSize = 16;
+            int iconX = realPaddingLeft + 4;
+            // 타이틀 바 높이에서 아이콘 사이즈(높이)를 뺀 뒤 2로 나누면 세로 중앙 정렬
+            int iconY = (TITLE_BAR_HEIGHT - iconSize) / 2;
+
+            int textX;
+            if (IconImage != null) // 만약 아이콘이 존재한다면 그리기 + 텍스트의 시작 X 위치가 아이콘 기준으로 오른쪽으로 이동
+            {
+                g.DrawImage(IconImage, iconX, iconY, iconSize, iconSize);
+                textX = iconX + iconSize + 4;
+            } else
+            {
+                textX = realPaddingLeft + 4; // 아니면 그냥 왼쪽 여백 기준으로 계산
+            }
+
+            // 텍스트 너비 = 전체 폭 - 왼쪽 기준 시작 지점 - 오른쪽 여백 - 버튼 3개 너비 - 버튼 간 간격 - 여유
+            int textWidth = width - textX - realPaddingRight
+                - closeButton.Width - maximizeButton.Width - minimizeButton.Width - 18;
+
             Rectangle textRect = new Rectangle(
-                realPaddingLeft, 0,
-                width - realPaddingLeft - realPaddingRight
-                - closeButton.Width - maximizeButton.Width - minimizeButton.Width - 18,
+                textX, 0,
+                textWidth,
                 Padding.Top
             );
 
@@ -349,7 +371,7 @@ namespace windows_xp_like
             // 컨트롤의 높이가 글자보다 클 때 세로 축 중앙으로 오도록 하려면 VerticalCenter
             // 텍스트를 왼쪽 정렬하기 위해 Left
             // 텍스트가 너무 길면 '...'와 같이 줄임표로 자르기
-            TextRenderer.DrawText(e.Graphics, Text, Font, textRect, _titleTextColor,
+            TextRenderer.DrawText(g, Text, Font, textRect, _titleTextColor,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.EndEllipsis);
         }
 

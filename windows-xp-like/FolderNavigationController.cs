@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
@@ -18,7 +19,7 @@ namespace windows_xp_like
         private string _currentKey; // 현재 폴더 키
 
         // 앱 실행을 데스크탑에 요청하기 위한 이벤트 신호
-        public event Action<FileSystemItem> AppLaunchRequested;
+        public event Action<FileSystemItem, Image> AppLaunchRequested;
 
         public FolderNavigationController(FolderView view, AppForm window, Dictionary<string, FolderData> fileSystemData, string startKey)
         {
@@ -61,7 +62,7 @@ namespace windows_xp_like
         /// 폴더에서 항목을 더블클릭했을 때 파일 실행 또는 내부 폴더 열기 동작을 시행하는 메서드
         /// </summary>
         /// <param name="item"></param>
-        private void OnItemDoubleClicked(FileSystemItem item)
+        private void OnItemDoubleClicked(FileSystemItem item, Image icon)
         {
             if (item == null) return;
 
@@ -79,7 +80,7 @@ namespace windows_xp_like
             }
             else // 폴더가 아니거나 탐색 키가 없다면 파일일 가능성이 있으므로 신호 보내기
             {
-                AppLaunchRequested?.Invoke(item); // 실제 파일 실행 가능 여부 등은 데스크탑에서 검사
+                AppLaunchRequested?.Invoke(item, icon); // 실제 파일 실행 가능 여부 등은 데스크탑에서 검사
             }
         }
 
@@ -136,13 +137,50 @@ namespace windows_xp_like
         }
 
         /// <summary>
+        /// 현재 폴더가 가진 아이템 항목을 검사해서 새폴더 (1)처럼 고유한 폴더 이름이 생성되도록 하는 메서드
+        /// </summary>
+        private string GetUniqueFolderName(List<FileSystemItem> items, string baseName)
+        {
+            string finalName = baseName;
+            int counter = 1; // 새 폴더가 이미 있으면 새 폴더 (1)부터 시작
+
+            bool isDuplicate = false; // 이름 중복 체크용
+
+            do // 고유한 이름을 찾을 때까지 반복하되, 일단 한 번은 검사해 봐야 하니 do while
+            {
+                isDuplicate = false; // 일단 중복 아닌 상태로 초기화
+
+                foreach (FileSystemItem item in items)
+                {
+                    // 대소문자 구분 없이 이름 비교해서 만약 같으면 중복
+                    if (item.Name.Equals(finalName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        isDuplicate = true;
+                        finalName = $"{baseName} ({counter})";
+                        counter++;
+                        break;
+                    }
+                }
+
+            } while (isDuplicate); // 위에서 중복이 발견되었다면 계속 반복되도록
+
+            return finalName;
+        }
+
+        /// <summary>
         /// 폴더 뷰로부터 새 폴더 생성 요청을 받아 처리하는 메서드
         /// </summary>
         private void OnCreateFolderRequested()
         {
-            // 새 폴더에 사용할 고유한 키 생성
+            List<FileSystemItem> currentItems = _fileSystemData[_currentKey].Items;
+
+            // 이름 중복 검사 후 고유한 이름을 받아와 저장
+            string newFolderName = GetUniqueFolderName(currentItems, "새 폴더");
+
+            // 새 폴더에 사용할 고유 키 생성
+            // Guid는 겹치지 않는 랜덤한 ID를 생성하는 기술로, 16진수 128비트로 표현
+            // 이러면 이름이 바뀌더라도 중복되지 않고 변하지 않는 키 생성 가능 
             string newFolderKey = "NAVIGATE_NEWFOLDER_" + Guid.NewGuid().ToString();
-            string newFolderName = "새 폴더";
 
             // 키와 이름을 바탕으로 새 파일 시스템 아이템 객체 생성
             FileSystemItem newItem = new FileSystemItem(newFolderName, newFolderKey);

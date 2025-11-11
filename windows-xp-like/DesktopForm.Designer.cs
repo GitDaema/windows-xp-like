@@ -28,19 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DesktopForm));
             this.desktopHost = new System.Windows.Forms.Panel();
+            this.folderIcon1 = new System.Windows.Forms.Label();
+            this.appIcon2 = new System.Windows.Forms.Label();
+            this.appIcon1 = new System.Windows.Forms.Label();
             this.taskbarPanel = new System.Windows.Forms.Panel();
             this.taskFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this.appIcon1 = new System.Windows.Forms.Label();
-            this.appIcon2 = new System.Windows.Forms.Label();
-            this.folderIcon1 = new System.Windows.Forms.Label();
+            this.clockLabel = new System.Windows.Forms.Label();
+            this.startButton = new System.Windows.Forms.Button();
+            this.clockTimer = new System.Windows.Forms.Timer(this.components);
             this.desktopHost.SuspendLayout();
             this.taskbarPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // desktopHost
             // 
+            this.desktopHost.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("desktopHost.BackgroundImage")));
+            this.desktopHost.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.desktopHost.Controls.Add(this.folderIcon1);
             this.desktopHost.Controls.Add(this.appIcon2);
             this.desktopHost.Controls.Add(this.appIcon1);
@@ -52,41 +58,27 @@
             this.desktopHost.TabIndex = 0;
             this.desktopHost.Click += new System.EventHandler(this.desktopHost_Click);
             // 
-            // taskbarPanel
+            // folderIcon1
             // 
-            this.taskbarPanel.BackColor = System.Drawing.SystemColors.MenuHighlight;
-            this.taskbarPanel.Controls.Add(this.taskFlowPanel);
-            this.taskbarPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.taskbarPanel.Location = new System.Drawing.Point(0, 651);
-            this.taskbarPanel.Name = "taskbarPanel";
-            this.taskbarPanel.Size = new System.Drawing.Size(1264, 30);
-            this.taskbarPanel.TabIndex = 1;
-            // 
-            // taskFlowPanel
-            // 
-            this.taskFlowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.taskFlowPanel.Location = new System.Drawing.Point(0, 0);
-            this.taskFlowPanel.Name = "taskFlowPanel";
-            this.taskFlowPanel.Size = new System.Drawing.Size(1264, 30);
-            this.taskFlowPanel.TabIndex = 0;
-            // 
-            // appIcon1
-            // 
-            this.appIcon1.BackColor = System.Drawing.Color.Transparent;
-            this.appIcon1.Image = ((System.Drawing.Image)(resources.GetObject("appIcon1.Image")));
-            this.appIcon1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.appIcon1.Location = new System.Drawing.Point(12, 9);
-            this.appIcon1.Name = "appIcon1";
-            this.appIcon1.Size = new System.Drawing.Size(50, 50);
-            this.appIcon1.TabIndex = 2;
-            this.appIcon1.Tag = "Icon";
-            this.appIcon1.Text = "appA";
-            this.appIcon1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.appIcon1.DoubleClick += new System.EventHandler(this.appIcon1_DoubleClick);
+            this.folderIcon1.BackColor = System.Drawing.Color.Transparent;
+            this.folderIcon1.Font = new System.Drawing.Font("굴림", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.folderIcon1.ForeColor = System.Drawing.SystemColors.Control;
+            this.folderIcon1.Image = ((System.Drawing.Image)(resources.GetObject("folderIcon1.Image")));
+            this.folderIcon1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.folderIcon1.Location = new System.Drawing.Point(12, 130);
+            this.folderIcon1.Name = "folderIcon1";
+            this.folderIcon1.Size = new System.Drawing.Size(50, 50);
+            this.folderIcon1.TabIndex = 4;
+            this.folderIcon1.Tag = "Icon";
+            this.folderIcon1.Text = "내 문서";
+            this.folderIcon1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.folderIcon1.DoubleClick += new System.EventHandler(this.folderIcon1_DoubleClick);
             // 
             // appIcon2
             // 
             this.appIcon2.BackColor = System.Drawing.Color.Transparent;
+            this.appIcon2.Font = new System.Drawing.Font("굴림", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.appIcon2.ForeColor = System.Drawing.SystemColors.Control;
             this.appIcon2.Image = ((System.Drawing.Image)(resources.GetObject("appIcon2.Image")));
             this.appIcon2.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.appIcon2.Location = new System.Drawing.Point(12, 69);
@@ -98,19 +90,71 @@
             this.appIcon2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.appIcon2.DoubleClick += new System.EventHandler(this.appIcon2_DoubleClick);
             // 
-            // folderIcon1
+            // appIcon1
             // 
-            this.folderIcon1.BackColor = System.Drawing.Color.Transparent;
-            this.folderIcon1.Image = ((System.Drawing.Image)(resources.GetObject("folderIcon1.Image")));
-            this.folderIcon1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.folderIcon1.Location = new System.Drawing.Point(12, 130);
-            this.folderIcon1.Name = "folderIcon1";
-            this.folderIcon1.Size = new System.Drawing.Size(50, 50);
-            this.folderIcon1.TabIndex = 4;
-            this.folderIcon1.Tag = "Icon";
-            this.folderIcon1.Text = "내 문서";
-            this.folderIcon1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.folderIcon1.DoubleClick += new System.EventHandler(this.folderIcon1_DoubleClick);
+            this.appIcon1.BackColor = System.Drawing.Color.Transparent;
+            this.appIcon1.Font = new System.Drawing.Font("굴림", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.appIcon1.ForeColor = System.Drawing.SystemColors.Control;
+            this.appIcon1.Image = ((System.Drawing.Image)(resources.GetObject("appIcon1.Image")));
+            this.appIcon1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.appIcon1.Location = new System.Drawing.Point(12, 9);
+            this.appIcon1.Name = "appIcon1";
+            this.appIcon1.Size = new System.Drawing.Size(50, 50);
+            this.appIcon1.TabIndex = 2;
+            this.appIcon1.Tag = "Icon";
+            this.appIcon1.Text = "appA";
+            this.appIcon1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.appIcon1.DoubleClick += new System.EventHandler(this.appIcon1_DoubleClick);
+            // 
+            // taskbarPanel
+            // 
+            this.taskbarPanel.BackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.taskbarPanel.Controls.Add(this.taskFlowPanel);
+            this.taskbarPanel.Controls.Add(this.startButton);
+            this.taskbarPanel.Controls.Add(this.clockLabel);
+            this.taskbarPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.taskbarPanel.Location = new System.Drawing.Point(0, 651);
+            this.taskbarPanel.Name = "taskbarPanel";
+            this.taskbarPanel.Size = new System.Drawing.Size(1264, 30);
+            this.taskbarPanel.TabIndex = 1;
+            this.taskbarPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.taskbarPanel_Paint);
+            // 
+            // taskFlowPanel
+            // 
+            this.taskFlowPanel.BackColor = System.Drawing.Color.Transparent;
+            this.taskFlowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.taskFlowPanel.Location = new System.Drawing.Point(90, 0);
+            this.taskFlowPanel.Name = "taskFlowPanel";
+            this.taskFlowPanel.Size = new System.Drawing.Size(1054, 30);
+            this.taskFlowPanel.TabIndex = 0;
+            // 
+            // clockLabel
+            // 
+            this.clockLabel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.clockLabel.Font = new System.Drawing.Font("굴림", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.clockLabel.ForeColor = System.Drawing.Color.White;
+            this.clockLabel.Location = new System.Drawing.Point(1144, 0);
+            this.clockLabel.Name = "clockLabel";
+            this.clockLabel.Padding = new System.Windows.Forms.Padding(0, 0, 9, 0);
+            this.clockLabel.Size = new System.Drawing.Size(120, 30);
+            this.clockLabel.TabIndex = 1;
+            this.clockLabel.Text = "오후 12:00 2025-11-11";
+            this.clockLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // startButton
+            // 
+            this.startButton.BackColor = System.Drawing.Color.ForestGreen;
+            this.startButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.startButton.FlatAppearance.BorderSize = 0;
+            this.startButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.startButton.Font = new System.Drawing.Font("휴먼둥근헤드라인", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.startButton.ForeColor = System.Drawing.Color.White;
+            this.startButton.Location = new System.Drawing.Point(0, 0);
+            this.startButton.Name = "startButton";
+            this.startButton.Size = new System.Drawing.Size(90, 30);
+            this.startButton.TabIndex = 2;
+            this.startButton.Text = "시작";
+            this.startButton.UseVisualStyleBackColor = false;
             // 
             // DesktopForm
             // 
@@ -135,6 +179,9 @@
         private System.Windows.Forms.Label appIcon1;
         private System.Windows.Forms.Label folderIcon1;
         private System.Windows.Forms.Label appIcon2;
+        private System.Windows.Forms.Button startButton;
+        private System.Windows.Forms.Label clockLabel;
+        private System.Windows.Forms.Timer clockTimer;
     }
 }
 

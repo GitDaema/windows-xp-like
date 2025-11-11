@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -12,7 +13,7 @@ namespace windows_xp_like
         public event Action CreateFolderRequested; // 새 폴더 생성 신호
 
         // 폴더 뷰의 아이템이 더블 클릭되었을 때의 이벤트 신호
-        public event Action<FileSystemItem> ItemDoubleClicked;
+        public event Action<FileSystemItem, Image> ItemDoubleClicked;
 
         // 검색 기능을 위해서 현재 폴더가 가지고 있는 아이템들을 저장하는 리스트
         private List<FileSystemItem> _currentItems = new List<FileSystemItem>();
@@ -45,14 +46,25 @@ namespace windows_xp_like
         {
             if (listView1.SelectedItems.Count == 1)
             {
+                // 사용 중인 이미지 리스트의 이미지를 가져오기 위해 리스트 뷰 자체를 가져오기
+                ListViewItem lvi = listView1.SelectedItems[0];
+
                 // 선택된 아이템들 중 0번 인덱스 항목의 태그를 이용해서 파일 아이템 가져오기
                 FileSystemItem selectedItem = listView1.SelectedItems[0].Tag as FileSystemItem;
 
                 if (selectedItem != null)
                 {
+                    // 이 아이템이 listView1에서 사용 중인 ImageList의 이미지를 가져옵니다.
+                    Image icon = null;
+                    // LargeImageList가 설정되어 있고, ImageIndex가 유효한 범위일 때
+                    if (listView1.LargeImageList != null && lvi.ImageIndex >= 0)
+                    {
+                        icon = listView1.LargeImageList.Images[lvi.ImageIndex];
+                    }
+
                     // 데스크톱에게 이벤트를 보내서 선택된 아이템에 맞는 실행 역할 넘기기
                     // 이벤트 방식 안 쓰면 public 메서드 직접 호출 방식이라 너무 의존
-                    ItemDoubleClicked?.Invoke(selectedItem);
+                    ItemDoubleClicked?.Invoke(selectedItem, icon);
                 }
             }
         }

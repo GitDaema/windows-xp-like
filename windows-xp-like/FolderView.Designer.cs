@@ -47,6 +47,7 @@
             this.tsbBack = new System.Windows.Forms.ToolStripButton();
             this.tsbUp = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.tstSearch = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsddbView = new System.Windows.Forms.ToolStripDropDownButton();
@@ -54,7 +55,6 @@
             this.자세히ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.간단히ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listView1 = new System.Windows.Forms.ListView();
-            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -95,8 +95,8 @@
             // 
             this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "folder.png");
-            this.imageList1.Images.SetKeyName(1, "cogwheel.png");
+            this.imageList1.Images.SetKeyName(0, "small_folder.png");
+            this.imageList1.Images.SetKeyName(1, "small_cogwheel.png");
             // 
             // menuStrip1
             // 
@@ -123,13 +123,13 @@
             this.새로만들기NToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.폴더FToolStripMenuItem});
             this.새로만들기NToolStripMenuItem.Name = "새로만들기NToolStripMenuItem";
-            this.새로만들기NToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.새로만들기NToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.새로만들기NToolStripMenuItem.Text = "새로 만들기(&N)";
             // 
             // 폴더FToolStripMenuItem
             // 
             this.폴더FToolStripMenuItem.Name = "폴더FToolStripMenuItem";
-            this.폴더FToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.폴더FToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.폴더FToolStripMenuItem.Text = "폴더(&F)";
             this.폴더FToolStripMenuItem.Click += new System.EventHandler(this.폴더ToolStripMenuItem_Click);
             // 
@@ -146,21 +146,21 @@
             // 큰아이콘LToolStripMenuItem
             // 
             this.큰아이콘LToolStripMenuItem.Name = "큰아이콘LToolStripMenuItem";
-            this.큰아이콘LToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.큰아이콘LToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.큰아이콘LToolStripMenuItem.Text = "큰 아이콘(&L)";
             this.큰아이콘LToolStripMenuItem.Click += new System.EventHandler(this.큰아이콘LToolStripMenuItem_Click);
             // 
             // 자세히DToolStripMenuItem
             // 
             this.자세히DToolStripMenuItem.Name = "자세히DToolStripMenuItem";
-            this.자세히DToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.자세히DToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.자세히DToolStripMenuItem.Text = "자세히(&D)";
             this.자세히DToolStripMenuItem.Click += new System.EventHandler(this.자세히DToolStripMenuItem_Click);
             // 
             // 간단히SToolStripMenuItem
             // 
             this.간단히SToolStripMenuItem.Name = "간단히SToolStripMenuItem";
-            this.간단히SToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.간단히SToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.간단히SToolStripMenuItem.Text = "간단히(&S)";
             this.간단히SToolStripMenuItem.Click += new System.EventHandler(this.간단히SToolStripMenuItem_Click);
             // 
@@ -206,6 +206,13 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
+            // toolStripLabel1
+            // 
+            this.toolStripLabel1.BackColor = System.Drawing.Color.Transparent;
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(31, 22);
+            this.toolStripLabel1.Text = "검색";
+            // 
             // tstSearch
             // 
             this.tstSearch.Font = new System.Drawing.Font("맑은 고딕", 9F);
@@ -234,19 +241,19 @@
             // 큰아이콘ToolStripMenuItem
             // 
             this.큰아이콘ToolStripMenuItem.Name = "큰아이콘ToolStripMenuItem";
-            this.큰아이콘ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.큰아이콘ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.큰아이콘ToolStripMenuItem.Text = "큰 아이콘";
             // 
             // 자세히ToolStripMenuItem
             // 
             this.자세히ToolStripMenuItem.Name = "자세히ToolStripMenuItem";
-            this.자세히ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.자세히ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.자세히ToolStripMenuItem.Text = "자세히";
             // 
             // 간단히ToolStripMenuItem
             // 
             this.간단히ToolStripMenuItem.Name = "간단히ToolStripMenuItem";
-            this.간단히ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.간단히ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.간단히ToolStripMenuItem.Text = "간단히";
             // 
             // listView1
@@ -265,13 +272,6 @@
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.DoubleClick += new System.EventHandler(this.ListView1_DoubleClick);
-            // 
-            // toolStripLabel1
-            // 
-            this.toolStripLabel1.BackColor = System.Drawing.Color.Transparent;
-            this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(31, 22);
-            this.toolStripLabel1.Text = "검색";
             // 
             // columnHeader1
             // 
