@@ -1,54 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace windows_xp_like
 {
     public partial class FolderView : UserControl
     {
-        // 폴더 뷰의 아이템이 더블 클릭되었을 때 
+        public event Action BackClicked; // 디렉토리에서 뒤로 가기 신호
+        public event Action UpClicked; // 위로 가기 신호
+        public event Action CreateFolderRequested; // 새 폴더 생성 신호
+
+        // 폴더 뷰의 아이템이 더블 클릭되었을 때의 이벤트 신호
         public event Action<FileSystemItem> ItemDoubleClicked;
+
+        // 검색 기능을 위해서 현재 폴더가 가지고 있는 아이템들을 저장하는 리스트
+        private List<FileSystemItem> _currentItems = new List<FileSystemItem>();
 
         public FolderView()
         {
             InitializeComponent();
         }
 
-        private void FolderView_Load(object sender, EventArgs e)
-        {
-            List<FileSystemItem> testDataList = new List<FileSystemItem>
-            {
-                new FileSystemItem("내 문서", true),
-                new FileSystemItem("Game.exe", false, new GameForm()),
-                new FileSystemItem("메모장.txt", false)
-            };
-
-            LoadItems(testDataList);
-        }
-
         /// <summary>
-        /// FileSystemItem 리스트를 받아서 그 항목들을 리스트 뷰에 아이템으로 넣는 메서드
+        /// 이번에 포커스된 폴더가 가진 파일들의 리스트를 받아서 그 항목들을 리스트 뷰에 아이템으로 넣는 메서드
         /// </summary>
         /// <param name="items"></param>
         public void LoadItems(List<FileSystemItem> items)
         {
-            listView1.Items.Clear(); // 혹시 모르니 아이템 항목 초기화 초기화
-
-            foreach (FileSystemItem item in items) // 리스트의 모든 아이템 순회
+            if(items != null) 
             {
-                // 아이템이 폴더라면 0번(폴더) 아이콘, 아니면 1번(파일) 아이콘
-                int iconIndex;
-                if (item.IsFolder)
-                    iconIndex = 0;
-                else
-                    iconIndex = 1;
-
-                // 리스트 뷰에 들어갈 수 있는 형태 자리를 생성한 후
-                ListViewItem lvi = new ListViewItem(item.Name, iconIndex);
-                lvi.Tag = item; // 태그를 이용해 어떤 파일 아이템인지 전달
-
-                listView1.Items.Add(lvi); // 리스트 뷰에 실제 추가
+                _currentItems = items;
+            } 
+            else
+            {
+                _currentItems = new List<FileSystemItem>();
             }
+
+            // 검색창에 텍스트가 있는지 확인하고 필터링해야만 제대로 폴더 항목 표시 가능 
+            FilterItems();
         }
 
         private void ListView1_DoubleClick(object sender, EventArgs e)
@@ -86,17 +76,7 @@ namespace windows_xp_like
 
         private void 폴더ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // 파일 아이템 형식으로 새 폴더 생성, 아직은 미구현된
-            FileSystemItem newItem = new FileSystemItem("새 폴더", true);
-
-            // 리스트 뷰에 추가 후 태그 연결
-            ListViewItem lvi = new ListViewItem(newItem.Name, 0);
-            lvi.Tag = newItem;
-
-            listView1.Items.Add(lvi);
-
-            // 새로 폴더 생성하면 무조건 이름 바꾸기 상태로 진입
-            lvi.BeginEdit();
+            CreateFolderRequested?.Invoke();
         }
 
         private void 삭제ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -105,6 +85,110 @@ namespace windows_xp_like
             foreach (ListViewItem item in listView1.SelectedItems)
             {
                 item.Remove(); // 실제 삭제 기능은 아니지만 우선 리스트 뷰에서는 제거
+            }
+        }
+
+        private void tsbBack_Click(object sender, EventArgs e)
+        {
+            // 뒤로 가기 버튼 자체는 자기가 뭘 해야 할지 모르며, 일부러 연결하면 오히려 과한 의존성 발생
+            // 따라서 뒤로 가달라는 신호만 보내 이를 받는 데스크탑에서 실제 뒤로 가기 행동 수행
+            BackClicked?.Invoke();
+        }
+
+        /// <summary>
+        /// 뒤로 가기 버튼의 활성화 여부를 바꾸는 메서드
+        /// </summary>
+        /// <param name="enabled">true면 뒤로 가기 버튼 활성화</param>
+        public void SetBackEnabled(bool enabled)
+        {
+            if (tsbBack != null)
+            {
+                tsbBack.Enabled = enabled;
+            }
+        }
+
+        /// <summary>
+        /// 위(부모 폴더)로 가기 버튼의 활성화 여부를 바꾸는 메서드
+        /// </summary>
+        /// <param name="enabled"></param>
+        public void SetUpEnabled(bool enabled)
+        {
+            if (tsbUp != null)
+            {
+                tsbUp.Enabled = enabled;
+            }
+        }
+
+        private void tsbUp_Click(object sender, EventArgs e)
+        {
+            UpClicked?.Invoke(); // 마찬가지로 위로 가달라는 신호를 데스크탑에 전달
+        }
+
+        private void 큰아이콘LToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            setView(View.LargeIcon);
+        }
+
+        private void 자세히DToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            setView(View.Details);
+        }
+
+        private void 간단히SToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            setView(View.List);
+        }
+
+        /// <summary>
+        /// 리스트 뷰의 보기 모드를 변경하는 메서드
+        /// </summary>
+        /// <param name="viewMode"></param>
+        private void setView(View viewMode)
+        {
+            listView1.View = viewMode;
+        }
+
+        private void tstSearch_TextChanged(object sender, EventArgs e)
+        {
+            FilterItems();
+        }
+
+        private void FilterItems()
+        {
+            // 우선은 대소문자 구별하지 않고 필터링
+            string filter = tstSearch.Text.Trim().ToLower();
+
+            listView1.Items.Clear(); // 리스트 뷰 비우고 시작
+
+            // 검색어가 없으면 모든 항목을 표시해야 하므로 원본 리스트 그대로 표시
+            List<FileSystemItem> itemsToShow;
+            if(string.IsNullOrEmpty(filter))
+            {
+                itemsToShow = _currentItems;
+            }
+            else // 있으면 필터링
+            {
+                // Where에서 끝나면 리스트 형식이 아니므로 오류, 반드시 ToList()를 이용해 새 리스트 형식으로 붙이기
+                itemsToShow = _currentItems
+                    .Where(item => item.Name.ToLower().Contains(filter))
+                    .ToList();
+            }
+
+
+            // 필터링된 아이템들로 리스트 뷰를 다시 채우기 위해 순회
+            foreach (var item in itemsToShow)
+            {
+                // 아이템이 폴더라면 0번(폴더) 아이콘, 아니면 1번(파일) 아이콘
+                int iconIndex = 0;
+                if (item.IsFolder)
+                    iconIndex = 0;
+                else
+                    iconIndex = 1;
+
+                // 리스트 뷰에 들어갈 수 있는 형태 자리를 생성한 후
+                ListViewItem lvi = new ListViewItem(item.Name, iconIndex);
+                lvi.Tag = item; // 태그를 이용해 어떤 파일 아이템인지 전달
+                listView1.Items.Add(lvi); // 리스트 뷰에 실제 추가
             }
         }
     }

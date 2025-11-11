@@ -59,6 +59,7 @@
       <DependentUpon>DesktopForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FileSystemItem.cs" />
+    <Compile Include="FolderNavigationController.cs" />
     <Compile Include="FolderView.cs">
       <SubType>UserControl</SubType>
     </Compile>
