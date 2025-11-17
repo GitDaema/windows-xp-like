@@ -733,6 +733,19 @@ namespace windows_xp_like
             }
             base.OnHandleDestroyed(e);
         }
+
+        /// <summary>
+        /// 키보드 포커스 제어가 필요한 인터페이스를 구현한 내부 폼을 가졌는지 검사해서 포커싱 제어를 하는 메서드
+        /// </summary>
+        /// <param name="isActive"></param>
+        public void SetActivationState(bool isActive)
+        {
+            // 키보드 포커스 제어가 필요한 인터페이스를 구현했는지 검사
+            if (_innerForm is IAppFormChild child)
+            {
+                child.SetFocusState(isActive); // 실제 구현된 내용에 맞게 포커싱 제어
+            }
+        }
     }
 
     /// <summary>
@@ -761,6 +774,20 @@ namespace windows_xp_like
             if (hit == _form || _form.Contains(hit))
             {
                 _form.BringToFront(); // 폼을 맨 위로 올리기
+
+                _form.SetActivationState(true); // 클릭된 자기 자신은 활성화 상태로
+
+                if (_form.Parent != null)
+                {
+                    // 자신이 활성화됐으니 다른 앱폼들이 비활성화되도록 순회하면서 알림
+                    foreach (Control c in _form.Parent.Controls)
+                    {
+                        if (c is AppForm otherForm && c != _form) // 이번 컨트롤이 앱 폼이지만 자신이 아닐 경우
+                        {
+                            otherForm.SetActivationState(false); // 비활성화 상태로 변경
+                        }
+                    }
+                }
 
                 Control desktopHost = _form.Parent;
                 Control taskbar = _form.TaskbarPanel;

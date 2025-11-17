@@ -82,12 +82,12 @@ namespace windows_xp_like
         // 바탕화면 테스트용 앱 아이콘 버튼 3개에 대한 각각의 클릭 이벤트
         private void appIcon1_DoubleClick(object sender, EventArgs e)
         {
-            LaunchAppFromIcon(new GameForm(), "App A", new Point(40, 40), new Size(520, 360), true, appIcon1.Image);
+            LaunchAppFromIcon(new MinesweeperGame(), "지뢰 찾기", new Point(ClientSize.Width / 2 - 250, 5), new Size(500, 520), true, appIcon1.Image);
         }
 
         private void appIcon2_DoubleClick(object sender, EventArgs e)
         {
-            LaunchAppFromIcon(new GameForm(), "App B", new Point(120, 80), new Size(520, 360), false, appIcon2.Image);
+            LaunchAppFromIcon(new BreakoutGame(), "벽돌 깨기", new Point(ClientSize.Width / 2 - 420, 80), new Size(840, 500), false, appIcon2.Image);
         }
 
         private void folderIcon1_DoubleClick(object sender, EventArgs e)

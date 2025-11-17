@@ -52,6 +52,9 @@
     <Compile Include="AppForm.Designer.cs">
       <DependentUpon>AppForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="BreakoutGame.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DesktopForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -71,6 +74,10 @@
     </Compile>
     <Compile Include="GameForm.Designer.cs">
       <DependentUpon>GameForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IAppFormChild.cs" />
+    <Compile Include="MinesweeperGame.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -36,8 +36,8 @@
             this.appIcon1 = new System.Windows.Forms.Label();
             this.taskbarPanel = new System.Windows.Forms.Panel();
             this.taskFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this.clockLabel = new System.Windows.Forms.Label();
             this.startButton = new System.Windows.Forms.Button();
+            this.clockLabel = new System.Windows.Forms.Label();
             this.clockTimer = new System.Windows.Forms.Timer(this.components);
             this.desktopHost.SuspendLayout();
             this.taskbarPanel.SuspendLayout();
@@ -65,9 +65,9 @@
             this.folderIcon1.ForeColor = System.Drawing.SystemColors.Control;
             this.folderIcon1.Image = ((System.Drawing.Image)(resources.GetObject("folderIcon1.Image")));
             this.folderIcon1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.folderIcon1.Location = new System.Drawing.Point(12, 130);
+            this.folderIcon1.Location = new System.Drawing.Point(12, 163);
             this.folderIcon1.Name = "folderIcon1";
-            this.folderIcon1.Size = new System.Drawing.Size(50, 50);
+            this.folderIcon1.Size = new System.Drawing.Size(60, 60);
             this.folderIcon1.TabIndex = 4;
             this.folderIcon1.Tag = "Icon";
             this.folderIcon1.Text = "내 문서";
@@ -81,12 +81,12 @@
             this.appIcon2.ForeColor = System.Drawing.SystemColors.Control;
             this.appIcon2.Image = ((System.Drawing.Image)(resources.GetObject("appIcon2.Image")));
             this.appIcon2.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.appIcon2.Location = new System.Drawing.Point(12, 69);
+            this.appIcon2.Location = new System.Drawing.Point(12, 86);
             this.appIcon2.Name = "appIcon2";
-            this.appIcon2.Size = new System.Drawing.Size(50, 50);
+            this.appIcon2.Size = new System.Drawing.Size(60, 60);
             this.appIcon2.TabIndex = 3;
             this.appIcon2.Tag = "Icon";
-            this.appIcon2.Text = "appB";
+            this.appIcon2.Text = "벽돌깨기";
             this.appIcon2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.appIcon2.DoubleClick += new System.EventHandler(this.appIcon2_DoubleClick);
             // 
@@ -99,10 +99,10 @@
             this.appIcon1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.appIcon1.Location = new System.Drawing.Point(12, 9);
             this.appIcon1.Name = "appIcon1";
-            this.appIcon1.Size = new System.Drawing.Size(50, 50);
+            this.appIcon1.Size = new System.Drawing.Size(60, 60);
             this.appIcon1.TabIndex = 2;
             this.appIcon1.Tag = "Icon";
-            this.appIcon1.Text = "appA";
+            this.appIcon1.Text = "지뢰찾기";
             this.appIcon1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.appIcon1.DoubleClick += new System.EventHandler(this.appIcon1_DoubleClick);
             // 
@@ -128,19 +128,6 @@
             this.taskFlowPanel.Size = new System.Drawing.Size(1054, 30);
             this.taskFlowPanel.TabIndex = 0;
             // 
-            // clockLabel
-            // 
-            this.clockLabel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.clockLabel.Font = new System.Drawing.Font("굴림", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.clockLabel.ForeColor = System.Drawing.Color.White;
-            this.clockLabel.Location = new System.Drawing.Point(1144, 0);
-            this.clockLabel.Name = "clockLabel";
-            this.clockLabel.Padding = new System.Windows.Forms.Padding(0, 0, 9, 0);
-            this.clockLabel.Size = new System.Drawing.Size(120, 30);
-            this.clockLabel.TabIndex = 1;
-            this.clockLabel.Text = "오후 12:00 2025-11-11";
-            this.clockLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
             // startButton
             // 
             this.startButton.BackColor = System.Drawing.Color.ForestGreen;
@@ -156,12 +143,26 @@
             this.startButton.Text = "시작";
             this.startButton.UseVisualStyleBackColor = false;
             // 
+            // clockLabel
+            // 
+            this.clockLabel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.clockLabel.Font = new System.Drawing.Font("굴림", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.clockLabel.ForeColor = System.Drawing.Color.White;
+            this.clockLabel.Location = new System.Drawing.Point(1144, 0);
+            this.clockLabel.Name = "clockLabel";
+            this.clockLabel.Padding = new System.Windows.Forms.Padding(0, 0, 9, 0);
+            this.clockLabel.Size = new System.Drawing.Size(120, 30);
+            this.clockLabel.TabIndex = 1;
+            this.clockLabel.Text = "오후 12:00 2025-11-11";
+            this.clockLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // DesktopForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.desktopHost);
+            this.MinimumSize = new System.Drawing.Size(1280, 720);
             this.Name = "DesktopForm";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.DesktopForm_Load);
