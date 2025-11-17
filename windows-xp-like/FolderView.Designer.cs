@@ -34,7 +34,7 @@
             this.새로만들기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.폴더ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.삭제ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.largeImageList = new System.Windows.Forms.ImageList(this.components);
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.파일FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.새로만들기NToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,6 +56,8 @@
             this.간단히ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.smallImageList = new System.Windows.Forms.ImageList(this.components);
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -91,12 +93,12 @@
             this.삭제ToolStripMenuItem.Text = "삭제";
             this.삭제ToolStripMenuItem.Click += new System.EventHandler(this.삭제ToolStripMenuItem_Click);
             // 
-            // imageList1
+            // largeImageList
             // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "small_folder.png");
-            this.imageList1.Images.SetKeyName(1, "small_cogwheel.png");
+            this.largeImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("largeImageList.ImageStream")));
+            this.largeImageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.largeImageList.Images.SetKeyName(0, "large_folder.png");
+            this.largeImageList.Images.SetKeyName(1, "large_cogwheel.png");
             // 
             // menuStrip1
             // 
@@ -259,16 +261,17 @@
             // listView1
             // 
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1});
+            this.columnHeader1,
+            this.columnHeader2});
             this.listView1.ContextMenuStrip = this.contextMenuStrip1;
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.HideSelection = false;
             this.listView1.LabelEdit = true;
-            this.listView1.LargeImageList = this.imageList1;
+            this.listView1.LargeImageList = this.largeImageList;
             this.listView1.Location = new System.Drawing.Point(0, 49);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(800, 551);
-            this.listView1.SmallImageList = this.imageList1;
+            this.listView1.SmallImageList = this.smallImageList;
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.DoubleClick += new System.EventHandler(this.ListView1_DoubleClick);
@@ -277,6 +280,18 @@
             // 
             this.columnHeader1.Text = "이름";
             this.columnHeader1.Width = 250;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "유형";
+            this.columnHeader2.Width = 120;
+            // 
+            // smallImageList
+            // 
+            this.smallImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("smallImageList.ImageStream")));
+            this.smallImageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.smallImageList.Images.SetKeyName(0, "small_folder.png");
+            this.smallImageList.Images.SetKeyName(1, "small_cogwheel.png");
             // 
             // FolderView
             // 
@@ -298,7 +313,7 @@
         }
 
         #endregion
-        private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.ImageList largeImageList;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 새로만들기ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 폴더ToolStripMenuItem;
@@ -324,5 +339,7 @@
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ImageList smallImageList;
     }
 }

@@ -530,18 +530,11 @@ namespace windows_xp_like
 
             _isRatioLocked = isRatioLocked;
 
-            foreach (Control c in Controls) // 우선 모든 컨트롤 탐색
+            if (_innerForm != null) // 만약 이미 컨트롤이 로드되어 있다면
             {
-                // 만약 그 컨트롤이 새로 넣을 컨트롤과 다르면서 창 컨트롤 버튼들이 아니라면
-                if (c != inner &&
-                    c != closeButton &&
-                    c != maximizeButton &&
-                    c != minimizeButton)
-                {
-                    // 내부에 이미 폼 또는 유저 컨트롤이 있었다는 뜻이므로 제거
-                    Controls.Remove(c);
-                    c.Dispose();
-                }
+                // 그 컨트롤은 이 앱 폼의 컨트롤에서 빼낸 뒤 없애야 안전
+                Controls.Remove(_innerForm);
+                _innerForm.Dispose();
             }
 
             _innerForm = inner; // 이후 기존 폼 초기화

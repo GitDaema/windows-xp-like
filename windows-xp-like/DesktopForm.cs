@@ -68,7 +68,9 @@ namespace windows_xp_like
             _fileSystemData.Add("NAVIGATE_DOCS", new FolderData("내 문서", null, new List<FileSystemItem>
             {
                 new FileSystemItem("새 폴더", "NAVIGATE_NEWFOLDER"),
-                new FileSystemItem("Game.exe", new GameForm())
+                // 폼 생성용 함수는 아무것도 받을 필요가 없으니 입력 매개변수 비우기
+                // 대신 호출되는 시점에 바로 새 폼을 만들어서 반환하기
+                new FileSystemItem("Game.exe", () => new GameForm())
             }));
 
             _fileSystemData.Add("NAVIGATE_NEWFOLDER", new FolderData("새 폴더", "NAVIGATE_DOCS", new List<FileSystemItem>
@@ -293,11 +295,13 @@ namespace windows_xp_like
         {
             if (item == null) return;
 
-            // ActionControl이 있어야 앱 폼에서 실행 가능한 파일이라는 뜻
-            if (item.ActionControl != null)
+            // 액션 컨트롤을 생성하는 팩토리 함수가 있어야 앱 폼에서 실행 가능한 파일
+            if (item.ActionControlFactory != null)
             {
-                // 이벤트로 전달 받은 아이콘을 여기서 넘겨줘야 파일 시스템 아이템에서 얻어온 이미지 반영 가능
-                LaunchApp(item.ActionControl, item.Name, new Point(150, 150), new Size(520, 360), true, icon);
+                // 펙토리 함수를 호출해서 매번 새 인스턴스를 생성
+                Control newControlInstance = item.ActionControlFactory();
+
+                LaunchApp(newControlInstance, item.Name, new Point(150, 150), new Size(520, 360), true, icon);
             }
             else
             {
@@ -371,16 +375,33 @@ namespace windows_xp_like
 
             Rectangle rect = taskbarPanel.ClientRectangle;
 
-            // 창의 상단바처럼 수직 방향 그라데이션 브러시 생성
-            // using을 이용해 자동으로 메모리 반환해서 누수 방지
             using (LinearGradientBrush brush = new LinearGradientBrush(
-                    rect,
-                    taskFlowBarUpColor,
-                    taskFlowBarDownColor,
-                    LinearGradientMode.Vertical))
+           rect,
+           taskFlowBarUpColor,
+           taskFlowBarDownColor,
+           LinearGradientMode.Vertical))
             {
-                g.FillRectangle(brush, rect); // 패널 배경에 그라데이션 채우기
+                // 그라데이션을 세밀하게 조작하기 위한 컬러 블렌드 객체 생성
+                ColorBlend cblend = new ColorBlend();
+
+                // 색상 배열은 밝은색을 맨 위에 놓고 조금 일찍 어두운 색으로 끊기
+                cblend.Colors = new Color[] {
+            taskFlowBarUpColor,
+            taskFlowBarDownColor,
+            taskFlowBarDownColor
+        };
+
+                // 밝은 색이 0%, 어두운 색이 40, 100%에 위치해서 그라데이션 중심 위쪽으로
+                cblend.Positions = new float[] {
+            0.0f,
+            0.2f,
+            1.0f
+        };
+                brush.InterpolationColors = cblend; // 브러시에 블렌드 설정 적용
+
+                g.FillRectangle(brush, rect);
             }
+
         }
 
         /// <summary>

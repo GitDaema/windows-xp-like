@@ -148,7 +148,7 @@ namespace windows_xp_like
 
         private void 간단히SToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            setView(View.List);
+            setView(View.SmallIcon);
         }
 
         /// <summary>
@@ -190,16 +190,42 @@ namespace windows_xp_like
             // 필터링된 아이템들로 리스트 뷰를 다시 채우기 위해 순회
             foreach (var item in itemsToShow)
             {
-                // 아이템이 폴더라면 0번(폴더) 아이콘, 아니면 1번(파일) 아이콘
                 int iconIndex = 0;
+                string itemType;
+
+                // 아이템이 폴더라면 0번(폴더) 아이콘, 아니면 1번(파일) 아이콘
+                // 추가적으로 자세히 보기 모드를 위한 서브 아이템 유형 정보 추가
                 if (item.IsFolder)
+                {
                     iconIndex = 0;
+                    itemType = "파일 폴더";
+                }
                 else
+                {
                     iconIndex = 1;
+
+                    // 확장자 정보는 따로 없어서 뒤에 붙은 확장자 텍스트로 구분
+                    if (item.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        itemType = "응용 프로그램";
+                    }
+                    else if (item.Name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+                    {
+                        itemType = "텍스트 문서";
+                    }
+                    else
+                    {
+                        itemType = "알 수 없는 파일"; // 혹시 모를 기본값
+                    }
+                }
 
                 // 리스트 뷰에 들어갈 수 있는 형태 자리를 생성한 후
                 ListViewItem lvi = new ListViewItem(item.Name, iconIndex);
                 lvi.Tag = item; // 태그를 이용해 어떤 파일 아이템인지 전달
+
+                // 두 번째 열에 표시될 텍스트를 SubItem으로 추가
+                lvi.SubItems.Add(itemType);
+
                 listView1.Items.Add(lvi); // 리스트 뷰에 실제 추가
             }
         }
