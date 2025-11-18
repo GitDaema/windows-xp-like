@@ -57,7 +57,7 @@ namespace windows_xp_like
             layout.RowCount = 6;
 
             // 화면을 상하 대칭으로 분할하기 위해 유동적인 공간인 퍼센트 할당
-            // 위와 아래 사이 중앙 지역에는 고정된 높이의 메뉴 버튼이 필요하므로 앱솔루트(고정) 설정 
+            // 위와 아래 사이 중앙 지역에는 고정된 높이의 메뉴 버튼이 필요하므로 고정 설정 
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 50f));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 80f));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 50f));
@@ -152,10 +152,12 @@ namespace windows_xp_like
             // 원래는 난이도에 따라 패널 여백을 계산했으나 창 크기 변경했을 때 한쪽으로 쏠리는 현상 발생
             gamePanel = new Panel
             {
-                Size = new Size(boardSize, boardSize),
-                BorderStyle = BorderStyle.FixedSingle,
+                BorderStyle = BorderStyle.None,
                 BackColor = Color.Gray
             };
+
+            gamePanel.ClientSize = new Size(boardSize, boardSize);
+
             // 게임 패널의 위치는 중앙 정렬 함수를 호출해서 지정
             CenterGamePanel(); 
 

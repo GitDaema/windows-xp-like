@@ -64,24 +64,6 @@ namespace windows_xp_like
         }
 
         /// <summary>
-        /// 앱 폼이 열리는 실행 파일 중 내부 컨트롤 생성용 함수만 전달하고 나머지는 기본값으로만 초기화하는 생성자
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="controlToLaunch"></param>
-        public FileSystemItem(string name, Func<Control> controlToLaunch)
-        {
-            Name = name;
-            IsFolder = false;
-            ActionKey = null;
-            ActionControlFactory = controlToLaunch;
-
-            // 아래는 기본값
-            InitialLocation = new Point(150, 150);
-            InitialSize = new Size(520, 360);
-            KeepAspectRatio = true;
-        }
-
-        /// <summary>
         /// 앱 폼이 열리는 실행 파일 중 내부 컨트롤 생성용 함수를 포함한 창 초기 위치, 크기, 비율 고정 여부 등을 명시적으로 초기화하는 생성자
         /// </summary>
         /// <param name="name"></param>

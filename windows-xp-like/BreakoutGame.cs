@@ -121,10 +121,11 @@ namespace windows_xp_like
             // 중앙 정렬용 패널을 만들어 거기에 담는 방식으로 변경
             gamePanel = new Panel
             {
-                Size = new Size(GAME_WIDTH, GAME_HEIGHT),
                 BackColor = Color.Black,
                 BorderStyle = BorderStyle.FixedSingle // 창의 크기거 커져도 외곽선을 확실히 알 수 있도록 설정
             };
+
+            gamePanel.ClientSize = new Size(GAME_WIDTH, GAME_HEIGHT);
 
             CenterGamePanel(); // 폼에 패널을 추가하기 전에 정렬 위치부터 계산
             this.Controls.Add(gamePanel);

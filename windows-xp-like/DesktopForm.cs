@@ -74,7 +74,7 @@ namespace windows_xp_like
                 // ()는 인자가 없다는 뜻이고, =>는 이 함수를 실행했을 때 오른쪽의 결과를 돌려주겠다는 뜻
                 // 즉, 지금 당장 폼을 만드는 것이 아니라 사용자가 클릭할 때 만들어야 할 함수 형태를 정보로 전달하는 것
                 // 이를 필요할 때 실행되는 콜백 형태라고도 함
-                new FileSystemItem("스네이크 게임.exe", () => new SnakeGame(), new Point(100, 100), new Size(520, 540), false)
+                new FileSystemItem("스네이크 게임.exe", () => new SnakeGame(), new Point(ClientSize.Width / 2 - 260, 30), new Size(520, 540), false)
             }));
 
             _fileSystemData.Add("NAVIGATE_NEWFOLDER", new FolderData("새 폴더", "NAVIGATE_DOCS", new List<FileSystemItem>
@@ -96,7 +96,7 @@ namespace windows_xp_like
 
         private void folderIcon1_DoubleClick(object sender, EventArgs e)
         {
-            LaunchAppFromIcon(new FolderView(), "내 문서", new Point(100, 60), new Size(450, 350), true, folderIcon1.Image, "NAVIGATE_DOCS");
+            LaunchAppFromIcon(new FolderView(), "내 문서", new Point(ClientSize.Width / 2 - 200, 60), new Size(450, 350), true, folderIcon1.Image, "NAVIGATE_DOCS");
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace windows_xp_like
                 // 펙토리 함수를 호출해서 매번 새 인스턴스를 생성
                 Control newControlInstance = item.ActionControlFactory();
 
-                LaunchApp(newControlInstance, item.Name, new Point(150, 150), new Size(520, 360), true, icon);
+                LaunchApp(newControlInstance, item.Name, item.InitialLocation, item.InitialSize, item.KeepAspectRatio, icon);
             }
             else
             {

@@ -868,6 +868,7 @@ namespace windows_xp_like
     public sealed class BringToFrontFilter : IMessageFilter
     {
         private const int WM_LBUTTONDOWN = 0x0201; // 좌클릭 메시지 상수 저장
+        private const int WM_NCLBUTTONDOWN = 0x00A1; // 자기 클라이언트가 아닌 상단바 등의 좌클릭 메시지 상수 저장
         private readonly AppForm _form;
 
         public BringToFrontFilter(AppForm form)
@@ -878,7 +879,7 @@ namespace windows_xp_like
         public bool PreFilterMessage(ref Message m)
         {
             // 메시지가 좌클릭이 아니면 무시
-            if (m.Msg != WM_LBUTTONDOWN) return false;
+            if (m.Msg != WM_LBUTTONDOWN && m.Msg != WM_NCLBUTTONDOWN) return false;
 
             // 좌클릭된 윈도우 핸들과 연결된 컨트롤 가져오기
             Control hit = Control.FromHandle(m.HWnd);

@@ -10,6 +10,7 @@ namespace windows_xp_like
     {
         private const int GAME_WIDTH = 480;
         private const int GAME_HEIGHT = 500;
+
         private const int GRID_SIZE = 20;
         private int SCORE_AREA_HEIGHT = 40;
 
@@ -69,6 +70,10 @@ namespace windows_xp_like
             this.KeyDown += new KeyEventHandler(OnKeyDown);
         }
 
+        /// <summary>
+        /// 키보드 포커싱 제어용 인터페이스를 구현한 메서드
+        /// </summary>
+        /// <param name="isActive"></param>
         public void SetFocusState(bool isActive)
         {
             _isInputActive = isActive;
@@ -91,10 +96,12 @@ namespace windows_xp_like
             // 더블 버퍼링으로 화면 깜빡임을 완화하기 위해 만든 커스텀 패널 클래스로 인스턴스화
             gamePanel = new DoubleBufferedPanel
             {
-                Size = new Size(GAME_WIDTH, GAME_HEIGHT),
                 BackColor = Color.Black,
                 BorderStyle = BorderStyle.Fixed3D // 뱀이 닿으면 게임오버되는 경계선을 뚜렷하게 표시하기 위한 테두리 스타일
             };
+
+            // 테두리가 적용된 상태에서 내부 크기를 지정해야 정확한 크기 반영 가능
+            gamePanel.ClientSize = new Size(GAME_WIDTH, GAME_HEIGHT);
 
             gamePanel.Paint += new PaintEventHandler(OnPaint);
             gamePanel.Click += (s, e) => this.Focus();
