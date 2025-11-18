@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace windows_xp_like
 {
@@ -147,7 +148,7 @@ namespace windows_xp_like
         }
 
         /// <summary>
-        /// 메시지를 가로채 규칙에 맞게 보정하도록 오버라이드한 메서드
+        /// 윈도우 메시지를 가로채 창 크기, 위치 등을 규칙에 맞게 보정한 후 답변을 돌려주도록 오버라이드한 메서드
         /// </summary>
         /// <param name="m"></param>
         protected override void WndProc(ref Message m)
@@ -214,6 +215,23 @@ namespace windows_xp_like
                 // 어느 방향으로 크기 조절 중인지에 대한 정수 코드를 32비트 부호 있는 정수로 받아오기
                 int edge = m.WParam.ToInt32();
 
+                // WM_SIZING 메시지가 제공하는 좌표와 Parent.ClientRectangle 좌표계가 서로 다름
+                // WM_SIZING은 모니터 전체가 기준이고, Parent.ClientRetangle은 부모 창 내부를 기준
+                // 그러니 부모 창 내부 기준 좌표를 스크린 좌표로 변환해서 실제 부모 영역 정보로 저장
+                Rectangle parentRect = Rectangle.Empty;
+                if (Parent != null)
+                    parentRect = Parent.RectangleToScreen(Parent.ClientRectangle); 
+
+                // 일단 어떻게든 부모 영역을 벗어나지 않도록 1차 제한
+                // 마우스가 부모 밖으로 나가더라도 창의 경계값이 부모 크기를 넘지 않도록 보정
+                if (Parent != null)
+                {
+                    if (rect.Left < parentRect.Left) rect.Left = parentRect.Left;
+                    if (rect.Top < parentRect.Top) rect.Top = parentRect.Top;
+                    if (rect.Right > parentRect.Right) rect.Right = parentRect.Right;
+                    if (rect.Bottom > parentRect.Bottom) rect.Bottom = parentRect.Bottom;
+                }
+
                 int padH = Padding.Horizontal;
                 int padV = Padding.Vertical;
 
@@ -225,40 +243,136 @@ namespace windows_xp_like
                 int contentHeight = newHeight - padV;
 
                 // 크기 조절 방향에 따라 비율을 맞추는 기준이 달라지므로 switch문
+                // 비율 맞추느라 다시 부모를 넘는 경우 또한 방지
                 switch (edge)
                 {
                     case WMSZ_LEFT:
                     case WMSZ_RIGHT:
+
                         // 왼쪽이나 오른쪽이면 가로가 바뀌는 거니 세로를 비율에 맞게 계산
                         // 세로는 곧 가로를 비율로 나누어 상쇄한 것
                         // 그리고 창의 하단이 새 높이에 맞게 조정되도록 강제
                         contentHeight = (int)(contentWidth / _innerFormRatio);
                         newHeight = contentHeight + padV;
-                        rect.Bottom = rect.Top + newHeight;
+
+                        // 계산된 높이가 부모를 넘어가면 높이를 부모에 맞추고 그에 따라 너비 다시 줄이기
+                        if (Parent != null && (rect.Top + newHeight) > parentRect.Bottom)
+                        {
+                            // 높이를 부모 최대치로 제한
+                            newHeight = parentRect.Bottom - rect.Top;
+                            contentHeight = newHeight - padV;
+
+                            // 너비를 다시 역으로 계산해 상쇄
+                            contentWidth = (int)(contentHeight * _innerFormRatio);
+                            newWidth = contentWidth + padH;
+
+                            if (edge == WMSZ_LEFT) rect.Left = rect.Right - newWidth;
+                            else rect.Right = rect.Left + newWidth;
+                        }
+                        else
+                        {
+                            rect.Bottom = rect.Top + newHeight;
+                        }
+
                         break;
                     case WMSZ_TOP:
                     case WMSZ_BOTTOM:
+
                         // 위나 아래면 세로가 바뀌는 거니 가로를 비율에 맞게 계산
                         // 가로는 곧 세로를 비율로 곱해 상쇄한 것
                         // 그리고 창의 오른쪽이 새 폭에 맞게 조정되도록 강제
                         contentWidth = (int)(contentHeight * _innerFormRatio);
                         newWidth = contentWidth + padH;
-                        rect.Right = rect.Left + newWidth;
+
+                        // 계산된 너비가 부모를 넘어가면 너비를 부모에 맞추고 그에 따라 높이를 다시 줄이기
+                        if (Parent != null && (rect.Left + newWidth) > parentRect.Right)
+                        {
+                            newWidth = parentRect.Right - rect.Left;
+                            contentWidth = newWidth - padH;
+
+                            contentHeight = (int)(contentWidth / _innerFormRatio);
+                            newHeight = contentHeight + padV;
+
+                            if (edge == WMSZ_TOP) rect.Top = rect.Bottom - newHeight;
+                            else rect.Bottom = rect.Top + newHeight;
+                        }
+                        else
+                        {
+                            rect.Right = rect.Left + newWidth;
+                        }
+
                         break;
 
-                    // 나머지 경우들은 가로와 세로가 동시에 변하는 대각선
-                    // 비율 계산 방법은 세로, 조정될 기준은 가로 방향에 따라 결정
+                    // 나머지 경우들은 가로와 세로가 동시에 변하는 대각선 크기 조절
                     case WMSZ_TOPLEFT:
                     case WMSZ_TOPRIGHT:
-                        contentHeight = (int)(contentWidth / _innerFormRatio);
-                        newHeight = contentHeight + padV;
-                        rect.Top = rect.Bottom - newHeight;
-                        break;
                     case WMSZ_BOTTOMLEFT:
                     case WMSZ_BOTTOMRIGHT:
+
+                        // 우선 대각선은 너비를 기준으로 높이를 맞추되, 높이가 넘치면 다시 역계산해서 상쇄
                         contentHeight = (int)(contentWidth / _innerFormRatio);
                         newHeight = contentHeight + padV;
-                        rect.Bottom = rect.Top + newHeight;
+
+                        bool heightOverflow = false;
+
+                        if (Parent != null)
+                        {
+                            // 만약 상좌, 상우 중 한 방향으로 늘렸을 경우 크기 조절로 인해 탑 위치가 바뀌었다는 뜻
+                            // 따라서 바텀에서 새 높이만큼 뺀 값이 비율 조정 후의 예상 값
+                            int proposedTop;
+                            if (edge == WMSZ_TOPLEFT || edge == WMSZ_TOPRIGHT)
+                            {
+                                proposedTop = rect.Bottom - newHeight;
+                            }
+                            else
+                            {
+                                proposedTop = rect.Top;
+                            }
+
+                            // 이것도 마찬가지로 하좌, 하우 중 한 방향으로 늘렸을 때 바텀 위치가 바뀌므로 예상 값 계산
+                            int proposedBottom;
+                            if (edge == WMSZ_BOTTOMLEFT || edge == WMSZ_BOTTOMRIGHT)
+                            {
+                                proposedBottom = rect.Top + newHeight;
+                            }
+                            else
+                            {
+                                proposedBottom = rect.Bottom;
+                            }
+
+                            // 너비 기준으로 계산했는데 탑 바텀 예상 값 중 하나라도 부모의 경계를 벗어나면 반드시 높이 수정 필요
+                            if (proposedTop < parentRect.Top || proposedBottom > parentRect.Bottom)
+                            {
+                                heightOverflow = true;
+                            }
+                        }
+
+                        if (heightOverflow)
+                        {
+                            // 우선 높이가 너무 길어서 문제인 것이므로 높이를 최대치로 설정
+                            // 이때 rect는 위에서 부모 크기를 넘지 못하도록 이미 값이 보정된 상태
+                            // 따라서 지금 rect의 높이를 기준으로 하면 그게 최대치
+                            newHeight = rect.Bottom - rect.Top;
+                            contentHeight = newHeight - padV;
+
+                            // 현재 rect의 높이를 기준으로 비율을 상쇄해 새 너비 계산
+                            contentWidth = (int)(contentHeight * _innerFormRatio);
+                            newWidth = contentWidth + padH;
+
+                            // 상좌 또는 하좌일 경우 레프트, 상우 또는 하우일 경우 라이트 조정
+                            if (edge == WMSZ_TOPLEFT || edge == WMSZ_BOTTOMLEFT)
+                                rect.Left = rect.Right - newWidth;
+                            else
+                                rect.Right = rect.Left + newWidth;
+                        }
+                        else // 높이가 괜찮다면 그냥 계산된 높이 적용
+                        {
+                            // 상좌 또는 상우일 경우 탑, 하좌 또는 하우일 경우 바텀 조정
+                            if (edge == WMSZ_TOPLEFT || edge == WMSZ_TOPRIGHT)
+                                rect.Top = rect.Bottom - newHeight;
+                            else
+                                rect.Bottom = rect.Top + newHeight;
+                        }
                         break;
                 }
 

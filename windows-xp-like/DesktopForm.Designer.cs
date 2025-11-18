@@ -164,7 +164,7 @@
             this.Controls.Add(this.desktopHost);
             this.MinimumSize = new System.Drawing.Size(1280, 720);
             this.Name = "DesktopForm";
-            this.Text = "Form1";
+            this.Text = "DesktopForm";
             this.Load += new System.EventHandler(this.DesktopForm_Load);
             this.desktopHost.ResumeLayout(false);
             this.taskbarPanel.ResumeLayout(false);

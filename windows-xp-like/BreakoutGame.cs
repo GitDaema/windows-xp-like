@@ -4,10 +4,15 @@ using System.Windows.Forms;
 
 namespace windows_xp_like
 {
-    public class BreakoutGame : Form, IAppFormChild
+    public class BreakoutGame : Form, IAppFormChild // 키보드 포커스 문제를 해결하기 위해 새로 만든 인터페이스 상속
     {
+        // 실제로 공이 돌아다닐 수 있는 게임 판 크기
         private const int GAME_WIDTH = 800;
         private const int GAME_HEIGHT = 450;
+
+        // 게임 판보다 좀 더 여유롭게 큰 창 최소 크기
+        private const int MIN_WIN_WIDTH = 840;
+        private const int MIN_WIN_HEIGHT = 500;
 
         bool goLeft;
         bool goRight;
@@ -37,12 +42,13 @@ namespace windows_xp_like
             this.Text = "벽돌 깨기";
             this.BackColor = Color.Black;
 
-            Size fixedSize = new Size(840, 500);
+            // 벽돌깨기는 위치에 민감하므로 최소 크기 설정
+            Size fixedSize = new Size(MIN_WIN_WIDTH, MIN_WIN_HEIGHT);
             this.MinimumSize = fixedSize;
             this.Size = fixedSize;
 
-            this.KeyPreview = true;
-            this.DoubleBuffered = true;
+            this.KeyPreview = true; // 포커스가 있는 컨트롤이 아닌 폼이 먼저 키를 가로챌 수 있도록 설정
+            this.DoubleBuffered = true; // 화면 깜빡임 방지용
 
             InitializeGameUI();
             PlaceBlocks();
@@ -54,42 +60,77 @@ namespace windows_xp_like
 
         public void SetFocusState(bool isActive)
         {
+            // 키보드 포커싱 제어 인터페이스에서 넘어와 구현된 메서드
+            // 벽돌깨기의 포커싱 제어는 창이 비활성화 상태일 때 방향키를 누르지 않은 상태로 초기화하는 것이 목표
+
             _isInputActive = isActive;
 
             if (!isActive)
             {
+                // 비활성 상태면 방향키 둘 중 아무것도 누르지 않은 것처럼 false 넣기
                 goLeft = false;
                 goRight = false;
             }
         }
 
+
+        /// <summary>
+        /// 윈도우 폼에서 방향키는 기본적으로 버튼 간 이동용이라 포커싱 이동 문제가 발생해 이를 게임 조작용으로만 쓰게끔 덮어쓴 메서드
+        /// </summary>
+        /// <param name="keyData"></param>
+        /// <returns></returns>
         protected override bool ProcessDialogKey(Keys keyData)
         {
+            // 창이 선택되지 않았을 때, 즉 비활성 상태라면 true 반환해서 완전 차단
+            // 이래야지만 포커스 이동과 게임 조작 둘 다 방지 가능
             if (!_isInputActive) return true;
 
+            // 만약 방향키 입력이면 포커스 기능을 끄고 게임 키로 인식시키도록 return false
+            // 이러면 윈도우가 이걸 일반 키 입력으로 취급해서 KeyDown 이벤트 발생
             if (keyData == Keys.Left || keyData == Keys.Right)
             {
                 return false;
             }
+
+            // 이 밖에는 그냥 기본 동작
             return base.ProcessDialogKey(keyData);
         }
 
         private void InitializeGameUI()
         {
-            this.SuspendLayout();
+            this.SuspendLayout(); // 깜빡임 방지를 위해 배치하는 동안만 화면 그리기 중지
 
+            // 람다식 형태 이벤트 추가
+            // s, e는 흔히 이벤트에서 받는 매개변수인 sender와 EventArgs, => 기호는 이 함수를 실행하면 오른쪽 코드가 실행된다는 뜻
+            // 쉽게 말해 컨트롤이 추가될 때마다 자동으로 클릭 시 포커스 가져오도록 이벤트 추가
+            this.ControlAdded += (s, e) =>
+            {
+                e.Control.Click += (sender, args) => this.Focus();
+
+                // 만약 패널 같은 컨테이너가 추가되면, 그 내부에도 똑같이 감지하도록 설정
+                e.Control.ControlAdded += (innerS, innerE) =>
+                {
+                    innerE.Control.Click += (sender, args) => this.Focus();
+                };
+            };
+
+            // 당연히 폼 자체를 클릭했을 때도 포커스
+            this.Click += (s, e) => this.Focus();
+
+            // 창 기준 절대 좌표로 계산해 블록을 추가했을 때 창 크기 변경 시 정렬 문제 발생
+            // 중앙 정렬용 패널을 만들어 거기에 담는 방식으로 변경
             gamePanel = new Panel
             {
                 Size = new Size(GAME_WIDTH, GAME_HEIGHT),
                 BackColor = Color.Black,
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle // 창의 크기거 커져도 외곽선을 확실히 알 수 있도록 설정
             };
 
-            gamePanel.Click += (s, e) => this.Focus();
-
-            CenterGamePanel();
+            CenterGamePanel(); // 폼에 패널을 추가하기 전에 정렬 위치부터 계산
             this.Controls.Add(gamePanel);
 
+            // 점수판 레이블, 게임 상태 표시 메시지용 레이블, 플레이어 픽쳐 박스, 공 픽쳐 박스 생성 코드
+            // 이 요소들 전부 창 크기와 관계 없이 중앙 정렬하기 위해 게임 패널에 담기
             txtScore = new Label
             {
                 Text = "Score: 0",
@@ -98,7 +139,6 @@ namespace windows_xp_like
                 AutoSize = true,
                 Location = new Point(10, 10)
             };
-            txtScore.Click += (s, e) => this.Focus();
             gamePanel.Controls.Add(txtScore);
 
             txtMessage = new Label
@@ -112,7 +152,6 @@ namespace windows_xp_like
                 Location = new Point((GAME_WIDTH - 400) / 2, (GAME_HEIGHT - 50) / 2),
                 Cursor = Cursors.Hand
             };
-            txtMessage.Click += (s, e) => this.Focus();
             gamePanel.Controls.Add(txtMessage);
 
             player = new PictureBox
@@ -140,16 +179,8 @@ namespace windows_xp_like
             this.KeyUp += KeyIsUp;
 
             this.Load += (s, e) => this.Focus();
-            this.Leave += (s, e) => ResetInputState();
-            this.Deactivate += (s, e) => ResetInputState();
 
             this.ResumeLayout(false);
-        }
-
-        private void ResetInputState()
-        {
-            goLeft = false;
-            goRight = false;
         }
 
         protected override void OnResize(EventArgs e)
@@ -158,13 +189,18 @@ namespace windows_xp_like
             CenterGamePanel();
         }
 
+        /// <summary>
+        /// 게임 패널을 중앙 정렬하기 위한 메서드
+        /// </summary>
         private void CenterGamePanel()
         {
             if (gamePanel != null)
             {
+                // x와 y 모두 실제 화면 크기에서 게임 패널 화면 크기를 뺀 것을 2로 나눈 것이 중앙값
                 int x = (this.ClientSize.Width - gamePanel.Width) / 2;
                 int y = (this.ClientSize.Height - gamePanel.Height) / 2;
 
+                // 만약 x 또는 y 값이 음수라면 0으로 맞춰 줘야 화면이 왼쪽 위로 넘어가는 것을 방지
                 if (x < 0) x = 0;
                 if (y < 0) y = 0;
 
@@ -282,6 +318,7 @@ namespace windows_xp_like
             ball.Left += ballx;
             ball.Top += bally;
 
+            // 원래는 테두리에 공이 닿으면 튕겼지만, 지금은 튕기는 
             if (ball.Left < 0 || ball.Left > (GAME_WIDTH - ball.Width))
             {
                 ballx = -ballx;

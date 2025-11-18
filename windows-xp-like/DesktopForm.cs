@@ -68,9 +68,13 @@ namespace windows_xp_like
             _fileSystemData.Add("NAVIGATE_DOCS", new FolderData("내 문서", null, new List<FileSystemItem>
             {
                 new FileSystemItem("새 폴더", "NAVIGATE_NEWFOLDER"),
-                // 폼 생성용 함수는 아무것도 받을 필요가 없으니 입력 매개변수 비우기
-                // 대신 호출되는 시점에 바로 새 폼을 만들어서 반환하기
-                new FileSystemItem("Game.exe", () => new GameForm())
+
+                // 객체 생성 문법 중 람다식을 이용한 생성자 호출 방식
+                // 람다식은 익명 함수로, 이름 없는 함수 자체를 인자로 넘기는 방식
+                // ()는 인자가 없다는 뜻이고, =>는 이 함수를 실행했을 때 오른쪽의 결과를 돌려주겠다는 뜻
+                // 즉, 지금 당장 폼을 만드는 것이 아니라 사용자가 클릭할 때 만들어야 할 함수 형태를 정보로 전달하는 것
+                // 이를 필요할 때 실행되는 콜백 형태라고도 함
+                new FileSystemItem("스네이크 게임.exe", () => new SnakeGame(), new Point(100, 100), new Size(520, 540), false)
             }));
 
             _fileSystemData.Add("NAVIGATE_NEWFOLDER", new FolderData("새 폴더", "NAVIGATE_DOCS", new List<FileSystemItem>
@@ -82,7 +86,7 @@ namespace windows_xp_like
         // 바탕화면 테스트용 앱 아이콘 버튼 3개에 대한 각각의 클릭 이벤트
         private void appIcon1_DoubleClick(object sender, EventArgs e)
         {
-            LaunchAppFromIcon(new MinesweeperGame(), "지뢰 찾기", new Point(ClientSize.Width / 2 - 250, 5), new Size(500, 520), true, appIcon1.Image);
+            LaunchAppFromIcon(new MinesweeperGame(), "지뢰 찾기", new Point(ClientSize.Width / 2 - 250, 5), new Size(500, 520), false, appIcon1.Image);
         }
 
         private void appIcon2_DoubleClick(object sender, EventArgs e)

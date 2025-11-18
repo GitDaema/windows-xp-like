@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace windows_xp_like
@@ -35,9 +36,25 @@ namespace windows_xp_like
         /// </summary>
         public string ActionKey { get; set; }
 
-        // 오버로딩을 이용해 폴더 생성과 파일 생성을 구분
-        // 폴더는 탐색용 ActionKey, 파일 종류는 앱 폼에서 열 ActionControl을 가짐
+        /// <summary>
+        /// 실행 파일이 열려 앱 폼이 생성됐을 때의 초기 위치
+        /// </summary>
+        public Point InitialLocation { get; set; }
+        /// <summary>
+        /// 실행 파일이 열려 앱 폼이 생성됐을 때의 초기 사이즈
+        /// </summary>
+        public Size InitialSize { get; set; }
+        /// <summary>
+        /// 실행 파일이 열려 앱 폼이 생성됐을 때 그 앱 폼의 비율 고정 여부, true면 비율 고정
+        /// </summary>
+        public bool KeepAspectRatio { get; set; }
 
+
+        /// <summary>
+        /// 단순 폴더로, 탐색에 필요한 네비게이션 키만 갖는 생성자
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="navigationKey"></param>
         public FileSystemItem(string name, string navigationKey)
         {
             Name = name;
@@ -47,7 +64,7 @@ namespace windows_xp_like
         }
 
         /// <summary>
-        /// 실행 가능한 파일 또는 특수 폴더에 대한 생성자, 앱 폼안에서 열릴 컨트롤 전달 함수 필요
+        /// 앱 폼이 열리는 실행 파일 중 내부 컨트롤 생성용 함수만 전달하고 나머지는 기본값으로만 초기화하는 생성자
         /// </summary>
         /// <param name="name"></param>
         /// <param name="controlToLaunch"></param>
@@ -57,6 +74,31 @@ namespace windows_xp_like
             IsFolder = false;
             ActionKey = null;
             ActionControlFactory = controlToLaunch;
+
+            // 아래는 기본값
+            InitialLocation = new Point(150, 150);
+            InitialSize = new Size(520, 360);
+            KeepAspectRatio = true;
+        }
+
+        /// <summary>
+        /// 앱 폼이 열리는 실행 파일 중 내부 컨트롤 생성용 함수를 포함한 창 초기 위치, 크기, 비율 고정 여부 등을 명시적으로 초기화하는 생성자
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="controlToLaunch"></param>
+        /// <param name="location"></param>
+        /// <param name="size"></param>
+        /// <param name="keepAspect"></param>
+        public FileSystemItem(string name, Func<Control> controlToLaunch, Point location, Size size, bool keepAspect)
+        {
+            Name = name;
+            IsFolder = false;
+            ActionKey = null;
+            ActionControlFactory = controlToLaunch;
+
+            InitialLocation = location;
+            InitialSize = size;
+            KeepAspectRatio = keepAspect;
         }
 
         /// <summary>

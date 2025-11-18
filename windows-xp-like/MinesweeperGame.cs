@@ -33,13 +33,14 @@ namespace windows_xp_like
         {
             this.Text = "지뢰찾기";
 
+            // 고정 크기 설정
             Size fixedSize = new Size(500, 520);
 
             this.MinimumSize = fixedSize;
             this.Size = fixedSize;
 
-            this.BackColor = Color.Silver;
-            this.DoubleBuffered = true;
+            this.BackColor = Color.Silver; // 혹시 몰라 지뢰찾기 배경색으로 설정
+            this.DoubleBuffered = true; // 깜빡임 방지를 위해 폼의 더블 버퍼링 설정 true로
 
             InitializeStartScreen();
         }
@@ -48,10 +49,15 @@ namespace windows_xp_like
         {
             this.Controls.Clear();
 
+            // 창 크기를 바꿀 때 절대 좌표는 위치가 틀어지므로 자동 정렬이 필요
+            // 표처럼 행과 열 격자를 만들어 UI 요소를 정렬하는 테이블 레이아웃 패널 활용
+
             TableLayoutPanel layout = new TableLayoutPanel();
             layout.Dock = DockStyle.Fill;
             layout.RowCount = 6;
 
+            // 화면을 상하 대칭으로 분할하기 위해 유동적인 공간인 퍼센트 할당
+            // 위와 아래 사이 중앙 지역에는 고정된 높이의 메뉴 버튼이 필요하므로 앱솔루트(고정) 설정 
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 50f));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 80f));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 50f));
@@ -68,6 +74,7 @@ namespace windows_xp_like
                 AutoSize = false
             };
 
+            // 버튼 생성할 때 좌표 지정 없이 Anchor로 중앙 정렬
             Button CreateMenuBtn(string text, int diff, int mines)
             {
                 Button btn = new Button { Text = text, Size = new Size(160, 35) };
@@ -77,6 +84,8 @@ namespace windows_xp_like
                 return btn;
             }
 
+            // 테이블에 요소들을 (요소, 열, 행) 순서로 매개변수에 담아 추가
+            // 요소들은 위에서부터 하나씩 위에서 설정한 고정 크기 행 차지
             layout.Controls.Add(title, 0, 1);
             layout.Controls.Add(CreateMenuBtn("쉬움 (10x10)", 0, 10), 0, 2);
             layout.Controls.Add(CreateMenuBtn("보통 (15x15)", 1, 40), 0, 3);
@@ -99,10 +108,11 @@ namespace windows_xp_like
 
         void InitializeGameUI()
         {
-            this.SuspendLayout(); 
+            this.SuspendLayout(); // 깜빡임 방지를 위한 그리기 일시 정지
 
             this.Controls.Clear();
 
+            // 상단 정보 표시용 패널 추가, DockStyle은 Top으로 해서 화면 상단바 기준 일정한 위치 유지
             topInfoPanel = new Panel
             {
                 Dock = DockStyle.Top,
@@ -132,19 +142,21 @@ namespace windows_xp_like
                 Dock = DockStyle.Right
             };
 
+            // 정보 표시 요소들을 상단 정보 표시용 패널에 담아서 창 크기가 바뀌어도 상대적으로 위치 유지
             topInfoPanel.Controls.Add(flagLabel);
             topInfoPanel.Controls.Add(timerLabel);
             this.Controls.Add(topInfoPanel);
 
-            // 게임판 패널 생성
+            
             int boardSize = GRID * CELL_SIZE;
+            // 원래는 난이도에 따라 패널 여백을 계산했으나 창 크기 변경했을 때 한쪽으로 쏠리는 현상 발생
             gamePanel = new Panel
             {
                 Size = new Size(boardSize, boardSize),
                 BorderStyle = BorderStyle.FixedSingle,
                 BackColor = Color.Gray
             };
-
+            // 게임 패널의 위치는 중앙 정렬 함수를 호출해서 지정
             CenterGamePanel(); 
 
             buttons = new Button[GRID, GRID];
@@ -177,21 +189,34 @@ namespace windows_xp_like
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            CenterGamePanel();
+            CenterGamePanel(); // 창 크기가 변할 때마다 게임 패널이 중앙 정렬되도록 호출
         }
 
         private void CenterGamePanel()
         {
-            if (gamePanel != null && !gamePanel.IsDisposed)
+            if (gamePanel != null && !gamePanel.IsDisposed) // 게임 패널 변수에 값이 들어 있고, 삭제되지 않았다면
             {
+                // (창 너비 - 게임판 너비) / 2가 곧 중앙 x 좌표
                 int x = (this.ClientSize.Width - gamePanel.Width) / 2;
 
-                int topOffset = topInfoPanel?.Height ?? 0;
+                int topOffset; // 상단 정보 표시용 패널의 높이 저장용
+                if (topInfoPanel != null)
+                {
+                    topOffset = topInfoPanel.Height;
+                }
+                else
+                {
+                    topOffset = 0;
+                }
 
                 int availableHeight = this.ClientSize.Height - topOffset;
 
+                // 식을 풀어 쓰면 (화면 높이)/2 - (정보 표시 패널 높이)/2 - (게임 패널 높이)/2 + (정보 표시 패널 높이)
+                // == (화면 높이)/2 - (게임 패널 높이)/2 + (정보 표시 패널 높이)/2
+                // 즉, x와 같은 원리로 중앙을 구하되 정보 표시 패널로 인해 잃은 상단 공간만큼 판을 밑으로 내리는 것
                 int y = (availableHeight - gamePanel.Height) / 2 + topOffset;
 
+                // 만약 y가 너무 작으면 상단 정보 표시 패널과 겹칠 수 있으므로 최솟값 보정 
                 if (y < topOffset + 5) y = topOffset + 5;
 
                 gamePanel.Location = new Point(x, y);
