@@ -11,7 +11,8 @@ using System.Windows.Forms;
 
 namespace windows_xp_like
 {
-    public partial class DesktopForm : Form
+    // 선택된 아이콘 해제 처리를 위한 마우스 전역 감시용 메시지 필터 인터페이스 구현 
+    public partial class DesktopForm : Form, IMessageFilter
     {
         // 폴더 탐색을 위해 모든 폴더의 데이터를 관리하는 딕셔너리
         // 폴더 키를 이용해 폴더 데이터 객체를 찾아 정보를 꺼내 적용하는 방식으로 사용할 예정
@@ -19,20 +20,35 @@ namespace windows_xp_like
 
         private Label _selectedIcon = null; // 현재 바탕화면에서 선택된 아이콘 레이블
 
-        private Color taskFlowBarUpColor = Color.FromArgb(56, 137, 255);
-        private Color taskFlowBarDownColor = Color.FromArgb(0, 48, 208);
+        // 작업 표시줄용
+        private Color xpTopColor = Color.FromArgb(110, 170, 255); // 밝은 하늘색
+        private Color xpMiddleColor = Color.FromArgb(35, 95, 225); // 파랑색
+        private Color xpBottomColor = Color.FromArgb(0, 45, 150); // 남색
+
+        // 시간 표시줄용
+        private Color xpTrayTopColor = Color.FromArgb(120, 195, 255); // 작업 표시줄보다 밝은 하늘색
+        private Color xpTrayBottomColor = Color.FromArgb(20, 135, 235); // 파랑색
+        private Color xpTrayShadow = Color.FromArgb(28, 90, 200); // 그림자 테두리용 남색       
 
         public DesktopForm()
         {
             InitializeComponent();
+
+            // 바탕화면 전체에서 마우스를 감지하기 위해 메세지 필터로 이
+            Application.AddMessageFilter(this);
         }
         private void DesktopForm_Load(object sender, EventArgs e)
         {
             // 루트 디렉토리에 파일 생성해 초기화
             InitFileSystem();
+
             // 보이는 순서가 작업 표시줄이 제일 위로, 바탕화면이 제일 뒤로 가도록 설정
             taskbarPanel.BringToFront();
             desktopHost.SendToBack();
+
+            // 디자인 뷰에서 테스트 중 너무 큰 이미지가 계속 뒷배경에 있으면 끊김 현상 발생
+            // 따라서 프로젝트 속성 -> 리소스 -> 리소스 추가 -> 기존 이미지 추가에서 해당 이미지 불러와 사용 
+            desktopHost.BackgroundImage = Properties.Resources.xp_background;
 
             // 바탕화면의 요소를 담는 데스크탑 호스트가 가진 모든 컨트롤 순회
             foreach (Control control in desktopHost.Controls)
@@ -40,19 +56,50 @@ namespace windows_xp_like
                 // 만약 컨트롤이 레이블이면서, 태그가 정상적으로 존재한다면
                 if (control is Label iconLabel && iconLabel.Tag != null)
                 {
-                    // 필수 아이콘 이벤트를 자동으로 연결
+                    // 아이콘 마우스 관련 이벤트 연결
                     iconLabel.Click += Icon_Click;
-                    iconLabel.MouseEnter += Icon_MouseEnter;
-                    iconLabel.MouseLeave += Icon_MouseLeave;
+                    //iconLabel.MouseEnter += Icon_MouseEnter;
+                    //iconLabel.MouseLeave += Icon_MouseLeave;
 
-                    // 아이콘의 텍스트 그림자 효과를 직접 그리기 위한 이벤트 연결
+                    // 아이콘의 텍스트 그림자 효과를 그리는 이벤트 연결
                     iconLabel.Paint += new PaintEventHandler(IconLabel_Paint);
                 }
             }
 
+            // 시작 버튼에 마우스를 올리거나 누르는 등의 이벤트 메서드 연결
+            SetStartButtonEvent();
+
+            CloseStartMenu(); // 처음 켰을 때 시작 메뉴 비활성화
+
             // 현재 시간을 알려주기 위한 타이머 시작 및 업데이트
             clockTimer.Start();
             UpdateClock();
+
+            // protected 때문에 접근 못하는 더블 버퍼링을 강제 활성화하기 위한 코드
+            // 빈 자리를 배경화면으로 다시 채우려고 하는 잔상을 없애기 위한 최적 설정
+            // 리플렉션은 평소에 접근할 수 없는 접근 한정자를 가진 내부 속성 등을 실행 도중 찾아내는 원리
+            // 원래는 사용에 주의 필요
+            typeof(Panel).InvokeMember("DoubleBuffered",
+                System.Reflection.BindingFlags.SetProperty |
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic,
+                null, desktopHost, new object[] { true });
+        }
+
+        private void SetStartButtonEvent()
+        {
+            // 원래였으면 이벤트 처리용 메서드를 4개 만들어야 했지만 람다식을 이용하면 한 곳에서 연결 가능
+            // 마우스 올리면 살짝 밝게 빛나는 이미지
+            startButton.MouseEnter += (s, e) => startButton.ImageIndex = 1;
+
+            // 마우스 나가면 원상 복구
+            startButton.MouseLeave += (s, e) => startButton.ImageIndex = 0;
+
+            // 누르면 어두운 이미지
+            startButton.MouseDown += (s, e) => startButton.ImageIndex = 2;
+
+            // 떼는 상황은 곧 마우스 올리고만 있는 상황과 같으므로 밝게 빛나는 이미지
+            startButton.MouseUp += (s, e) => startButton.ImageIndex = 1;
         }
 
         private void InitFileSystem()
@@ -74,7 +121,9 @@ namespace windows_xp_like
                 // ()는 인자가 없다는 뜻이고, =>는 이 함수를 실행했을 때 오른쪽의 결과를 돌려주겠다는 뜻
                 // 즉, 지금 당장 폼을 만드는 것이 아니라 사용자가 클릭할 때 만들어야 할 함수 형태를 정보로 전달하는 것
                 // 이를 필요할 때 실행되는 콜백 형태라고도 함
-                new FileSystemItem("스네이크 게임.exe", () => new SnakeGame(), new Point(ClientSize.Width / 2 - 260, 30), new Size(520, 540), false)
+                
+                // 아이콘 이미지 인덱스 번호인지 헷갈리므로 iconIndex: 명시
+                new FileSystemItem("스네이크 게임.exe", () => new SnakeGame(), new Point(ClientSize.Width / 2 - 260, 30), new Size(520, 540), false, iconIndex:2)
             }));
 
             _fileSystemData.Add("NAVIGATE_NEWFOLDER", new FolderData("새 폴더", "NAVIGATE_DOCS", new List<FileSystemItem>
@@ -210,7 +259,7 @@ namespace windows_xp_like
         {
             LaunchApp(actionControl, name, location, size, keepAspect, icon, folderStartKey);
 
-            desktopHost_Click(null, null);
+            UnselectIcon(); // 아이콘 선택 해제용 메서드 호출
         }
 
         /// <summary>
@@ -309,47 +358,19 @@ namespace windows_xp_like
             }
             else
             {
-                MessageBox.Show(item.Name + " 파일을 열 수 없습니다.");
+                // MessageBox.Show(item.Name + " 파일을 열 수 없습니다.");
             }
         }
 
         /// <summary>
         /// 아이콘이 아닌 바탕화면을 클릭했을 때 아이콘 선택을 해제하는 메서드
         /// </summary>
-        private void desktopHost_Click(object sender, EventArgs e)
+        private void UnselectIcon()
         {
-            // 만약 선택된 아이콘이 있었다면
-            if (_selectedIcon != null)
+            if (_selectedIcon != null) // 만약 선택된 아이콘이 있었다면 
             {
-                _selectedIcon.BackColor = Color.Transparent;
-                _selectedIcon = null; // 선택 해제
-            }
-        }
-
-        /// <summary>
-        /// 아이콘에 마우스가 들어왔을 때 아이콘 배경 색을 약간 바꾸는 메서드
-        /// </summary>
-        private void Icon_MouseEnter(object sender, EventArgs e)
-        {
-            var hoverLabel = sender as Label;
-
-            // 선택된 상태가 아닐 때만 변경해야 서로 겹치지 않음
-            if (hoverLabel != _selectedIcon)
-            {
-                hoverLabel.BackColor = SystemColors.ControlLight;
-            }
-        }
-
-        /// <summary>
-        /// 아이콘에서 마우스가 나갔을 때 아이콘 배경 색을 다시 기본값으로 바꾸는 메서드
-        /// </summary>
-        private void Icon_MouseLeave(object sender, EventArgs e)
-        {
-            var hoverLabel = sender as Label;
-
-            if (hoverLabel != _selectedIcon)
-            {
-                hoverLabel.BackColor = Color.Transparent;
+                _selectedIcon.Invalidate();
+                _selectedIcon = null;
             }
         }
 
@@ -361,51 +382,76 @@ namespace windows_xp_like
             var clickedLabel = sender as Label;
             if (clickedLabel == null) return;
 
-            // 만약 이전에 다른 아이콘이 선택되어 있었다면
-            if (_selectedIcon != null && _selectedIcon != clickedLabel)
-            {
-                _selectedIcon.BackColor = Color.Transparent; // 이전 아이콘은 기본 색으로 복원
-            }
+            // 이전에 선택된 아이콘이 있으면 다시 그리게 해서 아이콘 선택 효과 없애기
+            if (_selectedIcon != null) 
+                _selectedIcon.Invalidate();
 
-            // 새로 클릭한 아이콘을 선택한 아이콘으로 지정
-            _selectedIcon = clickedLabel;
-            _selectedIcon.BackColor = SystemColors.ControlLight;
+            _selectedIcon = clickedLabel; // 새로 선택된 아이콘을 갱신한 뒤
+
+            _selectedIcon.Invalidate(); // 그 아이콘 강제로 다시 그리기
+        }
+
+        private void startButton_Click(object sender, EventArgs e)
+        {
+            ToggleStartMenu();
+        }
+
+        private void ToggleStartMenu()
+        {
+            if (startMenuPanel.Visible)
+            {
+                CloseStartMenu();
+            }
+            else
+            {
+                OpenStartMenu();
+            }
+        }
+
+        private void OpenStartMenu()
+        {
+            startMenuPanel.Visible = true;
+            startMenuPanel.BringToFront(); // 시작 메뉴를 켰으므로 다른 컨트롤보다 반드시 위에 뜨기
+        }
+
+        private void CloseStartMenu()
+        {
+            startMenuPanel.Visible = false;
         }
 
         private void taskbarPanel_Paint(object sender, PaintEventArgs e)
         {
-            // 그라데이션을 그릴 Graphics 객체 가져오기
             Graphics g = e.Graphics;
-
             Rectangle rect = taskbarPanel.ClientRectangle;
 
+            // 그라데이션 브러시 생성
             using (LinearGradientBrush brush = new LinearGradientBrush(
-           rect,
-           taskFlowBarUpColor,
-           taskFlowBarDownColor,
-           LinearGradientMode.Vertical))
+                       rect,
+                       Color.White, // 어차피 아래 blend로 덮어씌워지지만 초기값 
+                       Color.Black,
+                       LinearGradientMode.Vertical))
             {
-                // 그라데이션을 세밀하게 조작하기 위한 컬러 블렌드 객체 생성
                 ColorBlend cblend = new ColorBlend();
 
-                // 색상 배열은 밝은색을 맨 위에 놓고 조금 일찍 어두운 색으로 끊기
                 cblend.Colors = new Color[] {
-            taskFlowBarUpColor,
-            taskFlowBarDownColor,
-            taskFlowBarDownColor
+            xpMiddleColor,
+            xpTopColor,
+            xpMiddleColor,
+            xpMiddleColor,
+            xpBottomColor
         };
 
-                // 밝은 색이 0%, 어두운 색이 40, 100%에 위치해서 그라데이션 중심 위쪽으로
                 cblend.Positions = new float[] {
             0.0f,
-            0.2f,
+            0.05f,
+            0.15f,
+            0.85f,
             1.0f
         };
-                brush.InterpolationColors = cblend; // 브러시에 블렌드 설정 적용
+                brush.InterpolationColors = cblend;
 
                 g.FillRectangle(brush, rect);
             }
-
         }
 
         /// <summary>
@@ -515,16 +561,38 @@ namespace windows_xp_like
         /// </summary>
         private void IconLabel_Paint(object sender, PaintEventArgs e)
         {
-            if (!(sender is Label))
-                return;
+            Label lbl = sender as Label;
+            if (lbl == null) return;
 
-            Label lbl = (Label)sender;
             Graphics g = e.Graphics;
 
-            string text = lbl.Text;
+            SizeF textSize = g.MeasureString(lbl.Text, lbl.Font);
+            RectangleF textRect = new RectangleF(
+                (lbl.Width - textSize.Width) / 2,
+                lbl.Height - textSize.Height,
+                textSize.Width,
+                textSize.Height);
 
-            if (string.IsNullOrEmpty(text)) 
-                return;
+            if (_selectedIcon == lbl)
+            {
+                if (lbl.Image != null)
+                {
+                    int imgX = (lbl.Width - lbl.Image.Width) / 2;
+                    int imgY = 4;
+
+                    Rectangle imgRect = new Rectangle(imgX, imgY, lbl.Image.Width, lbl.Image.Height);
+
+                    using (SolidBrush iconTintBrush = new SolidBrush(Color.FromArgb(128, 49, 106, 197)))
+                    {
+                        g.FillRectangle(iconTintBrush, imgRect);
+                    }
+                }
+
+                using (SolidBrush textBgBrush = new SolidBrush(Color.FromArgb(49, 106, 197)))
+                {
+                    g.FillRectangle(textBgBrush, textRect);
+                }
+            }
 
             // 텍스트 정렬은 아이콘 아래, 중앙 정렬 그대로
             TextFormatFlags flags = TextFormatFlags.HorizontalCenter |
@@ -534,12 +602,118 @@ namespace windows_xp_like
             // 1 픽셀 오른쪽 밑에 텍스트 그림자부터 그리기(순서상 더 아래에 위치해야 하므로 먼저 드로우)
             Rectangle shadowRect = new Rectangle(lbl.ClientRectangle.X + 1, lbl.ClientRectangle.Y + 1,
                                                 lbl.ClientRectangle.Width, lbl.ClientRectangle.Height);
-            TextRenderer.DrawText(g, text, lbl.Font, shadowRect, Color.Black, flags);
+
+            TextRenderer.DrawText(g, lbl.Text, lbl.Font, shadowRect, Color.Black, flags);
 
             // 그림자를 그린 뒤 원래 자리에 본문 텍스트 그리기
-            TextRenderer.DrawText(g, text, lbl.Font, lbl.ClientRectangle, lbl.ForeColor, flags);
+            TextRenderer.DrawText(g, lbl.Text, lbl.Font, lbl.ClientRectangle, lbl.ForeColor, flags);
         }
 
+        private void clockLabel_Paint(object sender, PaintEventArgs e)
+        {
+            Control ctrl = (Control)sender;
+            Graphics g = e.Graphics;
+            Rectangle rect = ctrl.ClientRectangle;
+
+            // 컨트롤의 클라이언트 크기 기준으로 텍스트를 오른쪽 위에 딱 붙는 문제 발생
+            // 오프셋으로 조정해 해결
+            Rectangle textRect = new Rectangle(rect.X, rect.Y + 2, rect.Width - 3, rect.Height);
+
+            using (LinearGradientBrush brush = new LinearGradientBrush(
+                rect,
+                xpTrayTopColor,
+                xpTrayBottomColor,
+                LinearGradientMode.Vertical))
+            {
+                ColorBlend cblend = new ColorBlend();
+                cblend.Colors = new Color[] {
+            xpTrayShadow,
+            xpTrayTopColor,
+            xpTrayBottomColor,
+            xpTrayBottomColor
+        };
+                cblend.Positions = new float[] { 0.0f, 0.05f, 0.15f, 1.0f };
+                brush.InterpolationColors = cblend;
+
+                g.FillRectangle(brush, rect);
+            }
+
+            int shadowWidth = 3;
+            Rectangle shadowRect = new Rectangle(0, 0, shadowWidth, rect.Height);
+
+            Color startColor = xpTrayShadow;
+            Color endColor = Color.Transparent;
+
+            using (LinearGradientBrush shadowBrush = new LinearGradientBrush(
+                   shadowRect, startColor, endColor, LinearGradientMode.Horizontal))
+            {
+                g.FillRectangle(shadowBrush, shadowRect);
+            }
+
+            if (ctrl is Label lbl)
+            {
+                TextFormatFlags flags = TextFormatFlags.Right |
+                                        TextFormatFlags.VerticalCenter |
+                                        TextFormatFlags.WordBreak; 
+
+                TextRenderer.DrawText(g, lbl.Text, lbl.Font, textRect, Color.White, flags);
+            }
+        }
+
+        /// <summary>
+        /// 앱의 모든 마우스 입력을 가로채서 확인하는 메서드
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public bool PreFilterMessage(ref Message m)
+        {
+            const int WM_LBUTTONDOWN = 0x201; // 마우스 좌클릭 신호
+            const int WM_NCLBUTTONDOWN = 0x00A1; // 혹시 모르니 클라이언트 영역이 아닌 창 테두리 좌클릭 신호도 포함
+
+            if (m.Msg == WM_LBUTTONDOWN || m.Msg == WM_NCLBUTTONDOWN) // 메시지가 좌클릭이면
+            {
+                if (_selectedIcon != null) // 선택된 아이콘이 있으면
+                {
+                    UnselectIcon(); // 아이콘 선택 해제
+                }
+
+                if (startMenuPanel.Visible) // 시작 메뉴가 열려있을 때
+                {
+                    Point mousePos = MousePosition;
+
+                    // 시작 메뉴의 화면상 영역
+                    Rectangle menuRect = startMenuPanel.RectangleToScreen(startMenuPanel.ClientRectangle);
+
+                    // 시작 버튼의 화면상 영역
+                    // 시작 버튼을 눌러서 닫을 때 충돌하면 안 되므로 우선 가져오기
+                    Rectangle startBtnRect = startButton.RectangleToScreen(startButton.ClientRectangle);
+
+                    // 마우스가 시작 메뉴나 시작 버튼 안에 없다면
+                    if (!menuRect.Contains(mousePos) && !startBtnRect.Contains(mousePos))
+                    {
+                        CloseStartMenu(); // 메뉴 닫기
+                    }
+                }
+            }
+
+            // 반드시 false를 반환해야 신호가 정상적으로 원래 가야 할 컨트롤에도 반영
+            return false;
+        }
+
+        private void offButton_MouseEnter(object sender, EventArgs e)
+        {
+            offButton.ImageIndex = 1;
+        }
+
+        private void offButton_MouseLeave(object sender, EventArgs e)
+        {
+            offButton.ImageIndex = 0;
+        }
+
+        private void offButton_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 
     /// <summary>

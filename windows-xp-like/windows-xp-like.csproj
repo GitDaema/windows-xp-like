@@ -104,6 +104,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -117,6 +118,39 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\win_desktop_bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\xp_background.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\folder_icon_64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\minesweeper_icon_64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\minesweeper_icon_64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\tb_back_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\tb_forward_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\tb_up_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\win_close_button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\folder_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\start_win.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

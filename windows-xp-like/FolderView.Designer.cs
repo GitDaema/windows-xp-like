@@ -44,20 +44,16 @@
             this.자세히DToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.간단히SToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.tsbBack = new System.Windows.Forms.ToolStripButton();
-            this.tsbUp = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.tstSearch = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsddbView = new System.Windows.Forms.ToolStripDropDownButton();
-            this.큰아이콘ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.자세히ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.간단히ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.smallImageList = new System.Windows.Forms.ImageList(this.components);
+            this.tsbBack = new System.Windows.Forms.ToolStripButton();
+            this.tsbUp = new System.Windows.Forms.ToolStripButton();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -97,8 +93,9 @@
             // 
             this.largeImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("largeImageList.ImageStream")));
             this.largeImageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.largeImageList.Images.SetKeyName(0, "large_folder.png");
-            this.largeImageList.Images.SetKeyName(1, "large_cogwheel.png");
+            this.largeImageList.Images.SetKeyName(0, "folder_icon.png");
+            this.largeImageList.Images.SetKeyName(1, "text_file_icon.png");
+            this.largeImageList.Images.SetKeyName(2, "snakegame_icon.png");
             // 
             // menuStrip1
             // 
@@ -108,7 +105,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(800, 25);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -116,8 +113,9 @@
             // 
             this.파일FToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.새로만들기NToolStripMenuItem});
+            this.파일FToolStripMenuItem.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.파일FToolStripMenuItem.Name = "파일FToolStripMenuItem";
-            this.파일FToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
+            this.파일FToolStripMenuItem.Size = new System.Drawing.Size(60, 21);
             this.파일FToolStripMenuItem.Text = "파일(&F)";
             // 
             // 새로만들기NToolStripMenuItem
@@ -125,13 +123,13 @@
             this.새로만들기NToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.폴더FToolStripMenuItem});
             this.새로만들기NToolStripMenuItem.Name = "새로만들기NToolStripMenuItem";
-            this.새로만들기NToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.새로만들기NToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.새로만들기NToolStripMenuItem.Text = "새로 만들기(&N)";
             // 
             // 폴더FToolStripMenuItem
             // 
             this.폴더FToolStripMenuItem.Name = "폴더FToolStripMenuItem";
-            this.폴더FToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.폴더FToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.폴더FToolStripMenuItem.Text = "폴더(&F)";
             this.폴더FToolStripMenuItem.Click += new System.EventHandler(this.폴더ToolStripMenuItem_Click);
             // 
@@ -141,28 +139,29 @@
             this.큰아이콘LToolStripMenuItem,
             this.자세히DToolStripMenuItem,
             this.간단히SToolStripMenuItem});
+            this.보기VToolStripMenuItem.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.보기VToolStripMenuItem.Name = "보기VToolStripMenuItem";
-            this.보기VToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
+            this.보기VToolStripMenuItem.Size = new System.Drawing.Size(62, 21);
             this.보기VToolStripMenuItem.Text = "보기(&V)";
             // 
             // 큰아이콘LToolStripMenuItem
             // 
             this.큰아이콘LToolStripMenuItem.Name = "큰아이콘LToolStripMenuItem";
-            this.큰아이콘LToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.큰아이콘LToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.큰아이콘LToolStripMenuItem.Text = "큰 아이콘(&L)";
             this.큰아이콘LToolStripMenuItem.Click += new System.EventHandler(this.큰아이콘LToolStripMenuItem_Click);
             // 
             // 자세히DToolStripMenuItem
             // 
             this.자세히DToolStripMenuItem.Name = "자세히DToolStripMenuItem";
-            this.자세히DToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.자세히DToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.자세히DToolStripMenuItem.Text = "자세히(&D)";
             this.자세히DToolStripMenuItem.Click += new System.EventHandler(this.자세히DToolStripMenuItem_Click);
             // 
             // 간단히SToolStripMenuItem
             // 
             this.간단히SToolStripMenuItem.Name = "간단히SToolStripMenuItem";
-            this.간단히SToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.간단히SToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.간단히SToolStripMenuItem.Text = "간단히(&S)";
             this.간단히SToolStripMenuItem.Click += new System.EventHandler(this.간단히SToolStripMenuItem_Click);
             // 
@@ -175,88 +174,41 @@
             this.toolStripSeparator1,
             this.toolStripLabel1,
             this.tstSearch,
-            this.toolStripSeparator2,
-            this.tsddbView});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
+            this.toolStripSeparator2});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 25);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolStrip1.Size = new System.Drawing.Size(800, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(800, 40);
             this.toolStrip1.TabIndex = 2;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // tsbBack
-            // 
-            this.tsbBack.Enabled = false;
-            this.tsbBack.Image = ((System.Drawing.Image)(resources.GetObject("tsbBack.Image")));
-            this.tsbBack.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbBack.Name = "tsbBack";
-            this.tsbBack.Size = new System.Drawing.Size(51, 22);
-            this.tsbBack.Text = "뒤로";
-            this.tsbBack.Click += new System.EventHandler(this.tsbBack_Click);
-            // 
-            // tsbUp
-            // 
-            this.tsbUp.Image = ((System.Drawing.Image)(resources.GetObject("tsbUp.Image")));
-            this.tsbUp.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbUp.Name = "tsbUp";
-            this.tsbUp.Size = new System.Drawing.Size(51, 22);
-            this.tsbUp.Text = "위로";
-            this.tsbUp.Click += new System.EventHandler(this.tsbUp_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 40);
             // 
             // toolStripLabel1
             // 
+            this.toolStripLabel1.AutoSize = false;
             this.toolStripLabel1.BackColor = System.Drawing.Color.Transparent;
+            this.toolStripLabel1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripLabel1.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(31, 22);
+            this.toolStripLabel1.Size = new System.Drawing.Size(37, 35);
             this.toolStripLabel1.Text = "검색";
             // 
             // tstSearch
             // 
-            this.tstSearch.Font = new System.Drawing.Font("맑은 고딕", 9F);
+            this.tstSearch.Font = new System.Drawing.Font("맑은 고딕", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.tstSearch.Name = "tstSearch";
-            this.tstSearch.Size = new System.Drawing.Size(100, 25);
+            this.tstSearch.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
+            this.tstSearch.Size = new System.Drawing.Size(130, 40);
             this.tstSearch.TextChanged += new System.EventHandler(this.tstSearch_TextChanged);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
-            // 
-            // tsddbView
-            // 
-            this.tsddbView.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsddbView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.큰아이콘ToolStripMenuItem,
-            this.자세히ToolStripMenuItem,
-            this.간단히ToolStripMenuItem});
-            this.tsddbView.Image = ((System.Drawing.Image)(resources.GetObject("tsddbView.Image")));
-            this.tsddbView.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsddbView.Name = "tsddbView";
-            this.tsddbView.Size = new System.Drawing.Size(29, 22);
-            this.tsddbView.Text = "보기";
-            // 
-            // 큰아이콘ToolStripMenuItem
-            // 
-            this.큰아이콘ToolStripMenuItem.Name = "큰아이콘ToolStripMenuItem";
-            this.큰아이콘ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-            this.큰아이콘ToolStripMenuItem.Text = "큰 아이콘";
-            // 
-            // 자세히ToolStripMenuItem
-            // 
-            this.자세히ToolStripMenuItem.Name = "자세히ToolStripMenuItem";
-            this.자세히ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-            this.자세히ToolStripMenuItem.Text = "자세히";
-            // 
-            // 간단히ToolStripMenuItem
-            // 
-            this.간단히ToolStripMenuItem.Name = "간단히ToolStripMenuItem";
-            this.간단히ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-            this.간단히ToolStripMenuItem.Text = "간단히";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 40);
             // 
             // listView1
             // 
@@ -268,9 +220,9 @@
             this.listView1.HideSelection = false;
             this.listView1.LabelEdit = true;
             this.listView1.LargeImageList = this.largeImageList;
-            this.listView1.Location = new System.Drawing.Point(0, 49);
+            this.listView1.Location = new System.Drawing.Point(0, 65);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(800, 551);
+            this.listView1.Size = new System.Drawing.Size(800, 535);
             this.listView1.SmallImageList = this.smallImageList;
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
@@ -290,8 +242,35 @@
             // 
             this.smallImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("smallImageList.ImageStream")));
             this.smallImageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.smallImageList.Images.SetKeyName(0, "small_folder.png");
-            this.smallImageList.Images.SetKeyName(1, "small_cogwheel.png");
+            this.smallImageList.Images.SetKeyName(0, "folder_icon.png");
+            this.smallImageList.Images.SetKeyName(1, "text_file_icon.png");
+            this.smallImageList.Images.SetKeyName(2, "snakegame_icon.png");
+            // 
+            // tsbBack
+            // 
+            this.tsbBack.Enabled = false;
+            this.tsbBack.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tsbBack.Image = global::windows_xp_like.Properties.Resources.tb_back_icon;
+            this.tsbBack.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.tsbBack.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbBack.Name = "tsbBack";
+            this.tsbBack.Size = new System.Drawing.Size(38, 37);
+            this.tsbBack.Text = "뒤로";
+            this.tsbBack.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.tsbBack.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.tsbBack.Click += new System.EventHandler(this.tsbBack_Click);
+            // 
+            // tsbUp
+            // 
+            this.tsbUp.AutoSize = false;
+            this.tsbUp.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tsbUp.Image = global::windows_xp_like.Properties.Resources.tb_up_icon;
+            this.tsbUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbUp.Name = "tsbUp";
+            this.tsbUp.Size = new System.Drawing.Size(38, 37);
+            this.tsbUp.Text = "위로";
+            this.tsbUp.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.tsbUp.Click += new System.EventHandler(this.tsbUp_Click);
             // 
             // FolderView
             // 
@@ -332,10 +311,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripTextBox tstSearch;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripDropDownButton tsddbView;
-        private System.Windows.Forms.ToolStripMenuItem 큰아이콘ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 자세히ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 간단히ToolStripMenuItem;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ColumnHeader columnHeader1;

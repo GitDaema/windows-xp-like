@@ -190,20 +190,18 @@ namespace windows_xp_like
             // 필터링된 아이템들로 리스트 뷰를 다시 채우기 위해 순회
             foreach (var item in itemsToShow)
             {
-                int iconIndex = 0;
+                int iconIndex = item.IconIndex;
+
                 string itemType;
 
-                // 아이템이 폴더라면 0번(폴더) 아이콘, 아니면 1번(파일) 아이콘
-                // 추가적으로 자세히 보기 모드를 위한 서브 아이템 유형 정보 추가
+
+                // 자세히 보기용 파일 유형 검사
                 if (item.IsFolder)
                 {
-                    iconIndex = 0;
                     itemType = "파일 폴더";
                 }
                 else
                 {
-                    iconIndex = 1;
-
                     // 확장자 정보는 따로 없어서 뒤에 붙은 확장자 텍스트로 구분
                     if (item.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                     {

@@ -48,19 +48,27 @@ namespace windows_xp_like
         /// 실행 파일이 열려 앱 폼이 생성됐을 때 그 앱 폼의 비율 고정 여부, true면 비율 고정
         /// </summary>
         public bool KeepAspectRatio { get; set; }
-
+        /// <summary>
+        /// 리스트 뷰에서 사용할 아이콘 인덱스 번호
+        /// </summary>
+        public int IconIndex { get; set; }
 
         /// <summary>
         /// 단순 폴더로, 탐색에 필요한 네비게이션 키만 갖는 생성자
         /// </summary>
         /// <param name="name"></param>
         /// <param name="navigationKey"></param>
-        public FileSystemItem(string name, string navigationKey)
+        public FileSystemItem(string name, string navigationKey, int iconIndex = -1)
         {
             Name = name;
             IsFolder = true;
             ActionKey = navigationKey;
             ActionControlFactory = null;
+
+            if (iconIndex == -1)
+                IconIndex = 0;
+            else
+                IconIndex = iconIndex;
         }
 
         /// <summary>
@@ -71,7 +79,7 @@ namespace windows_xp_like
         /// <param name="location"></param>
         /// <param name="size"></param>
         /// <param name="keepAspect"></param>
-        public FileSystemItem(string name, Func<Control> controlToLaunch, Point location, Size size, bool keepAspect)
+        public FileSystemItem(string name, Func<Control> controlToLaunch, Point location, Size size, bool keepAspect, int iconIndex = -1)
         {
             Name = name;
             IsFolder = false;
@@ -81,6 +89,11 @@ namespace windows_xp_like
             InitialLocation = location;
             InitialSize = size;
             KeepAspectRatio = keepAspect;
+
+            if (iconIndex == -1)
+                IconIndex = 1;
+            else
+                IconIndex = iconIndex;
         }
 
         /// <summary>
@@ -88,12 +101,22 @@ namespace windows_xp_like
         /// </summary>
         /// <param name="name"></param>
         /// <param name="isFolder"></param>
-        public FileSystemItem(string name, bool isFolder = false)
+        public FileSystemItem(string name, bool isFolder = false, int iconIndex = -1)
         {
             Name = name;
             IsFolder = isFolder;
             ActionKey = null;
             ActionControlFactory = null;
+
+            if (iconIndex == -1)
+            {
+                if (isFolder)
+                    IconIndex = 0;
+                else
+                    IconIndex = 1;
+            }
+            else
+                IconIndex = iconIndex;
         }
     }
 }

@@ -299,6 +299,8 @@ namespace windows_xp_like
 
         private void MainGameTimerEvent(object sender, EventArgs e)
         {
+            if (isGameOver) return;
+
             if (!_isInputActive)
             {
                 goLeft = false;

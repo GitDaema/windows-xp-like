@@ -60,15 +60,11 @@ namespace windows_xp_like
 
         public Control TaskbarPanel { get; set; }
 
-        // [NEW] 창 상태 관리
         private bool _isMaximized = false;
         private Rectangle _normalBounds; // 최대화 이전 Bounds 저장
 
-        // ===== Clamp 가드 =====
         private bool _clamping;
 
-        // ===== 폼 디자인 =====
-        // 윈도우 XP 창의 시작 색(밝은 파랑)
         private Color _titleBarBrightColor = Color.FromArgb(56, 137, 255);
         private Color _titleBarColor = Color.FromArgb(0, 88, 238);
 
@@ -91,54 +87,42 @@ namespace windows_xp_like
             this.MinimumSize = new Size(320, 200);
             this.DoubleBuffered = true;
 
-            // [NEW] 최소화 버튼 생성 및 추가
-            minimizeButton.Size = new System.Drawing.Size(28, 24);
             minimizeButton.UseVisualStyleBackColor = true;
             minimizeButton.Click += new System.EventHandler(this.minimizeButton_Click);
             this.Controls.Add(this.minimizeButton);
 
-            // [NEW] 최대화 버튼 생성 및 추가
-            maximizeButton.Size = new System.Drawing.Size(28, 24);
             maximizeButton.UseVisualStyleBackColor = true;
             maximizeButton.Click += new System.EventHandler(this.maximizeButton_Click);
             this.Controls.Add(this.maximizeButton);
 
-            // [중요] 폼이 리사이즈될 때마다 OnPaint를 다시 호출
             this.ResizeRedraw = true;
 
             this.Padding = new Padding(
-                GRIP_SIZE,              // Left
-                TITLE_BAR_HEIGHT,       // Top
-                GRIP_SIZE,              // Right
-                GRIP_SIZE               // Bottom
+                GRIP_SIZE,
+                TITLE_BAR_HEIGHT,
+                GRIP_SIZE,
+                GRIP_SIZE
             );
         }
 
-        // ===== Lifecycle =====
         private void AppForm_Load(object sender, EventArgs e)
         {
-            // [수정] 닫기 버튼은 폼에 직접 배치
-            closeButton.Size = new Size(28, 24);
             closeButton.Location = new Point(
-                this.ClientSize.Width - closeButton.Width - 6,
-                (TITLE_BAR_HEIGHT - closeButton.Height) / 2 // Padding 영역(타이틀바)에 수직 중앙
+                ClientSize.Width - closeButton.Width - 6,
+                (TITLE_BAR_HEIGHT - closeButton.Height) / 2
             );
             closeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             closeButton.BringToFront();
 
-            // [NEW] 최대화 버튼 위치 설정
-            maximizeButton.Size = new Size(28, 24);
             maximizeButton.Location = new Point(
-                closeButton.Location.X - maximizeButton.Width - 2, // 닫기 버튼 왼쪽에 배치
+                closeButton.Location.X - maximizeButton.Width - 2,
                 closeButton.Location.Y
             );
             maximizeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             maximizeButton.BringToFront();
 
-            // [NEW] 최소화 버튼 위치 설정
-            minimizeButton.Size = new Size(28, 24);
             minimizeButton.Location = new Point(
-                maximizeButton.Location.X - minimizeButton.Width - 2, // 최대화 버튼 왼쪽에 배치
+                maximizeButton.Location.X - minimizeButton.Width - 2,
                 closeButton.Location.Y
             );
             minimizeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -858,6 +842,28 @@ namespace windows_xp_like
             if (_innerForm is IAppFormChild child)
             {
                 child.SetFocusState(isActive); // 실제 구현된 내용에 맞게 포커싱 제어
+            }
+        }
+
+        /// <summary>
+        /// 운영체제 차원의 더블 버퍼링 활성화를 위해 덮어쓴 코드
+        /// </summary>
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                // 화면에 그려지기 전 메모리 버퍼를 사용하도록 강제해서 메모리에서 다 그리고 한 번에 화면에 뿌리는 원리
+
+                // 윈도우 폼을 만들 때 필요한 기본 설정 정보를 부모 클래스인 폼에서 가져와 저장한 뒤
+                CreateParams cp = base.CreateParams;
+
+                // 가져온 전체 설정 중 WS_EX_COMPOSITED에 해당하는 값을 OR 연산으로 덧붙이기
+                cp.ExStyle |= 0x02000000;
+
+                // WS_EX_COMPOSITED는 Window Style Extended Composited의 약자
+                // 모든 자식 창들의 그리기 작업을 밑에서부터 위로 하나의 버퍼에 합성해 처리하도록 지정하는 창 스타일이라는 뜻
+                // OR 특징상 기존 설정은 유지한 채로, 자식 컨트롤까지 한꺼번에 메모리에서 합성하라는 옵션만 켜는 것이 가능
+                return cp;
             }
         }
     }
