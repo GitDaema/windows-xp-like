@@ -78,7 +78,8 @@ namespace windows_xp_like
             // protected 때문에 접근 못하는 더블 버퍼링을 강제 활성화하기 위한 코드
             // 빈 자리를 배경화면으로 다시 채우려고 하는 잔상을 없애기 위한 최적 설정
             // 리플렉션은 평소에 접근할 수 없는 접근 한정자를 가진 내부 속성 등을 실행 도중 찾아내는 원리
-            // 원래는 사용에 주의 필요
+            // 원래는 사용에 주의가 필요하지만, 디자이너에서 만든 패널은 따로 스타일을 덮어쓰기 어려워서 사용
+
             typeof(Panel).InvokeMember("DoubleBuffered",
                 System.Reflection.BindingFlags.SetProperty |
                 System.Reflection.BindingFlags.Instance |

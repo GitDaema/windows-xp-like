@@ -845,27 +845,28 @@ namespace windows_xp_like
             }
         }
 
-        /// <summary>
-        /// 운영체제 차원의 더블 버퍼링 활성화를 위해 덮어쓴 코드
-        /// </summary>
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                // 화면에 그려지기 전 메모리 버퍼를 사용하도록 강제해서 메모리에서 다 그리고 한 번에 화면에 뿌리는 원리
+        // 이 부분은 아래의 윈도우 메시지 설정과 충돌하면서 그래픽이 깨지는 현상이 발생해서 주석 처리
+        ///// <summary>
+        ///// 운영체제 차원의 더블 버퍼링 활성화를 위해 덮어쓴 코드
+        ///// </summary>
+        //protected override CreateParams CreateParams
+        //{
+        //    get
+        //    {
+        //        // 화면에 그려지기 전 메모리 버퍼를 사용하도록 강제해서 메모리에서 다 그리고 한 번에 화면에 뿌리는 원리
 
-                // 윈도우 폼을 만들 때 필요한 기본 설정 정보를 부모 클래스인 폼에서 가져와 저장한 뒤
-                CreateParams cp = base.CreateParams;
+        //        // 윈도우 폼을 만들 때 필요한 기본 설정 정보를 부모 클래스인 폼에서 가져와 저장한 뒤
+        //        CreateParams cp = base.CreateParams;
 
-                // 가져온 전체 설정 중 WS_EX_COMPOSITED에 해당하는 값을 OR 연산으로 덧붙이기
-                cp.ExStyle |= 0x02000000;
+        //        // 가져온 전체 설정 중 WS_EX_COMPOSITED에 해당하는 값을 OR 연산으로 덧붙이기
+        //        cp.ExStyle |= 0x02000000;
 
-                // WS_EX_COMPOSITED는 Window Style Extended Composited의 약자
-                // 모든 자식 창들의 그리기 작업을 밑에서부터 위로 하나의 버퍼에 합성해 처리하도록 지정하는 창 스타일이라는 뜻
-                // OR 특징상 기존 설정은 유지한 채로, 자식 컨트롤까지 한꺼번에 메모리에서 합성하라는 옵션만 켜는 것이 가능
-                return cp;
-            }
-        }
+        //        // WS_EX_COMPOSITED는 Window Style Extended Composited의 약자
+        //        // 모든 자식 창들의 그리기 작업을 밑에서부터 위로 하나의 버퍼에 합성해 처리하도록 지정하는 창 스타일이라는 뜻
+        //        // OR 특징상 기존 설정은 유지한 채로, 자식 컨트롤까지 한꺼번에 메모리에서 합성하라는 옵션만 켜는 것이 가능
+        //        return cp;
+        //    }
+        //}
     }
 
     /// <summary>

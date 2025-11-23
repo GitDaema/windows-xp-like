@@ -32,6 +32,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DesktopForm));
             this.desktopHost = new System.Windows.Forms.Panel();
             this.startMenuPanel = new System.Windows.Forms.Panel();
+            this.offButton = new System.Windows.Forms.Button();
+            this.off_bt_imageList = new System.Windows.Forms.ImageList(this.components);
             this.folderIcon1 = new System.Windows.Forms.Label();
             this.appIcon2 = new System.Windows.Forms.Label();
             this.appIcon1 = new System.Windows.Forms.Label();
@@ -41,8 +43,6 @@
             this.startButton = new System.Windows.Forms.Button();
             this.start_bt_imageList = new System.Windows.Forms.ImageList(this.components);
             this.clockTimer = new System.Windows.Forms.Timer(this.components);
-            this.offButton = new System.Windows.Forms.Button();
-            this.off_bt_imageList = new System.Windows.Forms.ImageList(this.components);
             this.desktopHost.SuspendLayout();
             this.startMenuPanel.SuspendLayout();
             this.taskbarPanel.SuspendLayout();
@@ -50,6 +50,7 @@
             // 
             // desktopHost
             // 
+            this.desktopHost.BackColor = System.Drawing.Color.Transparent;
             this.desktopHost.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.desktopHost.Controls.Add(this.startMenuPanel);
             this.desktopHost.Controls.Add(this.folderIcon1);
@@ -73,6 +74,32 @@
             this.startMenuPanel.Name = "startMenuPanel";
             this.startMenuPanel.Size = new System.Drawing.Size(319, 394);
             this.startMenuPanel.TabIndex = 5;
+            // 
+            // offButton
+            // 
+            this.offButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("offButton.BackgroundImage")));
+            this.offButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.offButton.FlatAppearance.BorderSize = 0;
+            this.offButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+            this.offButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.offButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.offButton.ImageIndex = 0;
+            this.offButton.ImageList = this.off_bt_imageList;
+            this.offButton.Location = new System.Drawing.Point(216, 362);
+            this.offButton.Name = "offButton";
+            this.offButton.Size = new System.Drawing.Size(98, 31);
+            this.offButton.TabIndex = 6;
+            this.offButton.UseVisualStyleBackColor = true;
+            this.offButton.Click += new System.EventHandler(this.offButton_Click);
+            this.offButton.MouseEnter += new System.EventHandler(this.offButton_MouseEnter);
+            this.offButton.MouseLeave += new System.EventHandler(this.offButton_MouseLeave);
+            // 
+            // off_bt_imageList
+            // 
+            this.off_bt_imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("off_bt_imageList.ImageStream")));
+            this.off_bt_imageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.off_bt_imageList.Images.SetKeyName(0, "pc_off_bt.png");
+            this.off_bt_imageList.Images.SetKeyName(1, "pc_off_bt_hover.png");
             // 
             // folderIcon1
             // 
@@ -184,46 +211,25 @@
             // 
             this.start_bt_imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("start_bt_imageList.ImageStream")));
             this.start_bt_imageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.start_bt_imageList.Images.SetKeyName(0, "start_bt_idle.png");
-            this.start_bt_imageList.Images.SetKeyName(1, "start_bt_hover.png");
-            this.start_bt_imageList.Images.SetKeyName(2, "start_bt_press.png");
-            // 
-            // offButton
-            // 
-            this.offButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("offButton.BackgroundImage")));
-            this.offButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.offButton.FlatAppearance.BorderSize = 0;
-            this.offButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
-            this.offButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
-            this.offButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.offButton.ImageIndex = 0;
-            this.offButton.ImageList = this.off_bt_imageList;
-            this.offButton.Location = new System.Drawing.Point(216, 362);
-            this.offButton.Name = "offButton";
-            this.offButton.Size = new System.Drawing.Size(98, 31);
-            this.offButton.TabIndex = 6;
-            this.offButton.UseVisualStyleBackColor = true;
-            this.offButton.Click += new System.EventHandler(this.offButton_Click);
-            this.offButton.MouseEnter += new System.EventHandler(this.offButton_MouseEnter);
-            this.offButton.MouseLeave += new System.EventHandler(this.offButton_MouseLeave);
-            // 
-            // off_bt_imageList
-            // 
-            this.off_bt_imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("off_bt_imageList.ImageStream")));
-            this.off_bt_imageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.off_bt_imageList.Images.SetKeyName(0, "pc_off_bt.png");
-            this.off_bt_imageList.Images.SetKeyName(1, "pc_off_bt_hover.png");
+            this.start_bt_imageList.Images.SetKeyName(0, "start_bt_kr_idle.png");
+            this.start_bt_imageList.Images.SetKeyName(1, "start_bt_kr_hover.png");
+            this.start_bt_imageList.Images.SetKeyName(2, "start_bt_kr_press.png");
+            this.start_bt_imageList.Images.SetKeyName(3, "start_bt_idle.png");
+            this.start_bt_imageList.Images.SetKeyName(4, "start_bt_hover.png");
+            this.start_bt_imageList.Images.SetKeyName(5, "start_bt_press.png");
             // 
             // DesktopForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.desktopHost);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(1280, 720);
             this.Name = "DesktopForm";
-            this.Text = "DesktopForm";
+            this.Text = "Window XP";
             this.Load += new System.EventHandler(this.DesktopForm_Load);
             this.desktopHost.ResumeLayout(false);
             this.startMenuPanel.ResumeLayout(false);
