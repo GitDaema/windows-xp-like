@@ -15,6 +15,9 @@ namespace windows_xp_like
         // 폴더 뷰의 아이템이 더블 클릭되었을 때의 이벤트 신호
         public event Action<FileSystemItem, Image> ItemDoubleClicked;
 
+        // 삭제 요청을 보낼 이벤트 신호(리스트인 이유는 한 번에 여러 개 삭제할 수 있기 때문)
+        public event Action<List<FileSystemItem>> DeleteItemsRequested;
+
         // 검색 기능을 위해서 현재 폴더가 가지고 있는 아이템들을 저장하는 리스트
         private List<FileSystemItem> _currentItems = new List<FileSystemItem>();
 
@@ -91,12 +94,31 @@ namespace windows_xp_like
             CreateFolderRequested?.Invoke();
         }
 
+
         private void 삭제ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // 선택한 항목이 0개면 삭제할 것도 없으니 리턴
+            if (listView1.SelectedItems.Count == 0) 
+                return;
+
+            // 삭제할 데이터 아이템들을 임시로 담을 리스트
+            List<FileSystemItem> itemsToDelete = new List<FileSystemItem>();
+
             // 리스트 뷰의 기본 기능을 이용해 여러 아이템을 선택할 수도 있으므로 전부 순회
             foreach (ListViewItem item in listView1.SelectedItems)
             {
-                item.Remove(); // 실제 삭제 기능은 아니지만 우선 리스트 뷰에서는 제거
+                // UI에서 지우기 전에 태그에 있는 실제 데이터를 꺼내 리스트에 담음
+                if (item.Tag is FileSystemItem fsItem)
+                {
+                    itemsToDelete.Add(fsItem);
+                }
+                item.Remove(); // UI 화면에서만 삭제되고 실제 제거는 이벤트를 통해 진행
+            }
+
+            // 담아둔 아이템 리스트를 실어 삭제 요청 이벤트 발송
+            if (itemsToDelete.Count > 0)
+            {
+                DeleteItemsRequested?.Invoke(itemsToDelete);
             }
         }
 

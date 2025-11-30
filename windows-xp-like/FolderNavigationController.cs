@@ -33,6 +33,7 @@ namespace windows_xp_like
             _view.BackClicked += OnBackClicked;
             _view.UpClicked += OnUpClicked;
             _view.CreateFolderRequested += OnCreateFolderRequested;
+            _view.DeleteItemsRequested += OnDeleteItemsRequested;
         }
 
         /// <summary>
@@ -194,6 +195,32 @@ namespace windows_xp_like
 
             // 목록이 변경되었으니 폴더 뷰에 갱신 요청
             _view.LoadItems(_fileSystemData[_currentKey].Items);
+        }
+
+        /// <summary>
+        /// 폴더 뷰로부터 삭제 요청을 받아 실제 데이터 리스트에서 제거하는 메서드
+        /// </summary>
+        private void OnDeleteItemsRequested(List<FileSystemItem> itemsToDelete)
+        {
+            // 현재 보고 있는 폴더의 실제 데이터 리스트 가져오기
+            if (_fileSystemData.ContainsKey(_currentKey))
+            {
+                List<FileSystemItem> currentFolderItems = _fileSystemData[_currentKey].Items;
+
+                foreach (FileSystemItem item in itemsToDelete)
+                {
+                    // 리스트에서 해당 객체를 찾아서 제거
+                    // 사실 리스트에 담긴 아이템의 참조 값이 같아서 제거되는 것
+                    currentFolderItems.Remove(item);
+
+                    // 만약 지운 게 폴더였다면 딕셔너리의 키 데이터도 지우기
+                    // 이는 나중에 있을 키 문제 예방 + 메모리 관리를 위한 것
+                    if (item.IsFolder && item.ActionKey != null)
+                    {
+                        _fileSystemData.Remove(item.ActionKey);
+                    }
+                }
+            }
         }
     }
 }
